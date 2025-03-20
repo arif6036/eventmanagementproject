@@ -29,7 +29,7 @@ app.use(express.urlencoded({ extended: true })); // 🔹 Parses URL-encoded bodi
 
 
 // ✅ Routes
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
   res.send("Welcome ");
 });
 app.use("/api/payment", paymentRoutes);
