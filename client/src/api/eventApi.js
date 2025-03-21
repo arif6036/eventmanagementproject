@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = `${import.meta.env.VITE_BACKEND_URL}/api/events`;
+const API_URL = `${import.meta.env.VITE_BACKEND_URL}/api/events`;// Fetch All Events
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
   return token ? { Authorization: `Bearer ${token}` } : {};
