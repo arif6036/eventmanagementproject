@@ -38,6 +38,7 @@ const protect = async (req, res, next) => {
 
         if (!req.user) {
             return res.status(401).json({ message: "User not found" });
+            
         }
 
         next();
@@ -56,3 +57,4 @@ const adminOnly = (req, res, next) => {
 };
 
 module.exports = { protect, adminOnly, generateTokenResponse };
+

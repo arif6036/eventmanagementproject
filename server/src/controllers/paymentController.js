@@ -38,34 +38,37 @@ const initiatePayment = async (req, res) => {
 // ✅ Confirm Booking After Payment Success
 const confirmBooking = async (req, res) => {
   try {
-    const { eventId, ticketType, price, quantity } = req.body;
-    const userId = req.user.id;
+    const { eventId } = req.params;
+    const { ticketType, price, quantity } = req.body;
+    const userId = req.user?.id;
 
-    if (!eventId || !ticketType || !price || !quantity) {
-      return res.status(400).json({ message: "Missing booking details." });
-    }
-
-    // ✅ Verify Event Exists
-    const event = await Event.findById(eventId);
-    if (!event) {
-      return res.status(404).json({ message: "Event not found." });
-    }
-
-    // ✅ Create Ticket in Database
-    const ticket = await Ticket.create({
-      event: event._id,
-      user: userId,
+    console.log("Confirm Booking Request:", {
+      eventId,
+      userId,
       ticketType,
       price,
       quantity,
     });
 
-    res.status(201).json({ message: "Ticket booked successfully", ticket });
+    if (!userId) {
+      return res.status(400).json({ message: "User authentication failed. Please login again." });
+    }
 
+    const ticket = new Ticket({
+      event: eventId,
+      user: userId,
+      ticketType,
+      price,
+      quantity: quantity || 1,
+    });
+
+    await ticket.save();
+    return res.status(201).json({ message: "Ticket booked successfully!", ticket });
   } catch (error) {
-    console.error("Booking Confirmation Error:", error);
-    res.status(500).json({ message: "Failed to confirm booking.", error: error.message });
+    console.error("Booking Error:", error);
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
 
 module.exports = { initiatePayment, confirmBooking };
