@@ -19,9 +19,13 @@ connectDB();
 const app = express();
 
 // ✅ CORS Middleware (Dynamically from .env)
-const allowedOrigins = process.env.FRONTEND_URL || "http://localhost:5173";
-app.use(cors({ origin: allowedOrigins, credentials: true, methods: "GET,HEAD,PUT,PATCH,POST,DELETE", allowedHeaders: "Content-Type,Authorization" }));
-
+const allowedOrigins = process.env.FRONTEND_URL?.split(",") || ["http://localhost:5173"];
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders: "Content-Type,Authorization"
+}));
 // ✅ Middleware
 app.use(cookieParser()); // 🔹 Parses cookies for authentication
 app.use(express.json()); // 🔹 Parses JSON bodies
@@ -29,9 +33,6 @@ app.use(express.urlencoded({ extended: true })); // 🔹 Parses URL-encoded bodi
 
 
 // ✅ Routes
-app.get("/api", (req, res) => {
-  res.send("Welcome ");
-});
 app.use("/api/payment", paymentRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/events", eventRoutes);
@@ -48,3 +49,5 @@ app.use((err, req, res, next) => {
 // ✅ Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+module.exports = app; // For Vercel
