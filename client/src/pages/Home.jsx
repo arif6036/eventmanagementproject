@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -7,34 +7,24 @@ import { FaCalendarAlt, FaTicketAlt, FaPlusCircle } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { getAllEvents } from "../api/eventApi";
 
-import "../styles/global.css"; // Import styles
+import "../styles/global.css";
 
 const HomePage = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
 
-  // ✅ Define state
-  
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(""); 
+  const [error, setError] = useState("");
   const [showPopup, setShowPopup] = useState(false);
-  useEffect(() => {
-    console.log("User from Redux:", user);
-  }, [user]);
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        setLoading(true);
         const data = await getAllEvents();
-
-        if (!Array.isArray(data)) {
-          throw new Error("Invalid API response");
-        }
-
+        if (!Array.isArray(data)) throw new Error("Invalid API response");
         setEvents(data);
       } catch (err) {
-        console.error("Error fetching events:", err.message);
         setError("Failed to load events. Please try again later.");
       } finally {
         setLoading(false);
@@ -44,82 +34,85 @@ const HomePage = () => {
     fetchEvents();
   }, []);
 
-  // ✅ Prevent crashes by checking `loading` and `error`
-  if (loading)
-    return (
-      <div className="text-center mt-5">
-        <Spinner animation="border" variant="primary" />
-        <p>Loading events...</p>
-      </div>
-    );
-  
-  if (error) return <p className="text-danger text-center">{error}</p>;
-
-  // ✅ Handle Event Register Button Click
   const handleRegisterEvent = () => {
-    console.log("User Role:", user?.role); // ✅ Debugging Log
-  
-    if (user?.role?.toLowerCase() === "admin") {  // ✅ Ensure case-insensitive check
+    if (user?.role?.toLowerCase() === "admin") {
       navigate("/registerevent");
     } else {
       setShowPopup(true);
-      toast.error("Access Denied! Only admins can register events.");
+      toast.error("Only admins can register events!");
       setTimeout(() => setShowPopup(false), 3000);
     }
   };
+
   return (
     <div className="home-container">
-      <motion.div
-        className="cover-section"
+      {/* Cover Section */}
+      <motion.section
+        className="cover-section d-flex flex-column justify-content-center align-items-center text-center py-5"
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.5 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.2 }}
+        style={{ background: "linear-gradient(to right, #005f3f, #013220)", color: "#fff", minHeight: "70vh" }}
       >
-        <h1 className="cover-title">Discover & Book Your Next Experience</h1>
-        <p className="cover-subtitle">Find the best events, book tickets, and create unforgettable memories.</p>
-
-        {/* ✅ Navigation Buttons */}
-        <div className="button-group">
-          <Button variant="success" size="lg" onClick={() => navigate("/events")}>
-            <FaCalendarAlt /> Explore Events
+        <h1 className="display-4 fw-bold mb-3">Discover & Book Your Next Experience</h1>
+        <p className="lead mb-4">Find amazing events, book tickets, and create unforgettable moments.</p>
+        <div className="d-flex flex-wrap gap-3 justify-content-center">
+          <Button variant="light" size="lg" onClick={() => navigate("/events")}>
+            <FaCalendarAlt className="me-2" /> Explore Events
           </Button>
-          {/* <Button variant="success" size="lg" onClick={() => navigate("/events")}>
-            <FaTicketAlt /> Book Tickets
-          </Button> */}
-          <Button variant="success" size="lg" onClick={handleRegisterEvent}>
-            <FaPlusCircle /> Register Event
+          <Button variant="outline-light" size="lg" onClick={handleRegisterEvent}>
+            <FaPlusCircle className="me-2" /> Register Event
           </Button>
         </div>
+        {showPopup && <Alert variant="danger" className="mt-3">Only admins can register events!</Alert>}
+      </motion.section>
 
-        {showPopup && <Alert variant="danger" className="mt-2">Only admins can register events!</Alert>}
-      </motion.div>
+      {/* Trending Events */}
+      <Container className="py-5">
+        <h2 className="mb-4 text-center fw-semibold text-dark">🔥 Trending Events</h2>
 
-      <Container className="mt-5">
-        <h2 className="section-title">Trending & Popular Events</h2>
-        <Row>
-          {events.length > 0 ? (
-            events.map((event) => (
-              <Col md={6} lg={4} key={event._id} className="d-flex align-items-stretch">
-                <Card className="mb-3 shadow-sm w-100 event-card">
-                  <Card.Img
-                    variant="top"
-                    src={event.image || "/default-event.jpg"} // ✅ Prevent missing image errors
-                    alt={event.title}
-                    style={{ height: "200px", objectFit: "cover" }}
-                  />
-                  <Card.Body>
-                    <Card.Title>{event.title}</Card.Title>
-                    <Button variant="secondary" onClick={() => navigate(`/events/${event._id}`)}>
+        {loading ? (
+          <div className="text-center my-5">
+            <Spinner animation="border" variant="primary" />
+            <p className="mt-3">Loading events...</p>
+          </div>
+        ) : error ? (
+          <Alert variant="danger" className="text-center">{error}</Alert>
+        ) : events.length === 0 ? (
+          <p className="text-center text-muted">No events available.</p>
+        ) : (
+          <Row xs={1} md={2} lg={3} className="g-4">
+            {events.map((event) => (
+              <Col key={event._id}>
+                <Card className="h-100 shadow-sm event-card border-0 rounded-4 overflow-hidden">
+                  <div className="overflow-hidden">
+                    <Card.Img
+                      variant="top"
+                      src={event.image || "/default-event.jpg"}
+                      alt={event.title}
+                      className="img-fluid"
+                      style={{ height: "200px", objectFit: "cover", transition: "transform 0.4s" }}
+                      onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                      onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                    />
+                  </div>
+                  <Card.Body className="d-flex flex-column justify-content-between">
+                    <div>
+                      <Card.Title className="text-primary fw-bold">{event.title}</Card.Title>
+                      <Card.Text className="text-muted small mb-2">
+                        <FaCalendarAlt className="me-1" /> {new Date(event.date).toLocaleDateString()} <br />
+                        <FaTicketAlt className="me-1" /> {event.venue}
+                      </Card.Text>
+                    </div>
+                    <Button variant="outline-primary" className="mt-3 w-100" onClick={() => navigate(`/events/${event._id}`)}>
                       View Event
                     </Button>
                   </Card.Body>
                 </Card>
               </Col>
-            ))
-          ) : (
-            <p className="text-center">No events available.</p>
-          )}
-        </Row>
+            ))}
+          </Row>
+        )}
       </Container>
     </div>
   );

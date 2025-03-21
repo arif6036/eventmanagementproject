@@ -928,4 +928,13 @@ body {
   object-fit: cover;
   border-radius: 10px 10px 0 0;
 }
+.home-container {
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.event-card:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+  transition: all 0.3s ease-in-out;
+}
 
