@@ -19,12 +19,18 @@ connectDB();
 const app = express();
 
 // ✅ CORS Middleware (Dynamically from .env)
-const allowedOrigins = process.env.FRONTEND_URL?.split(",") || ["https://eventmanagementprojectbackend.vercel.app/"];//localhost channged to https://eventmanagementprojectbackend.vercel.app/
+const allowedOrigins = process.env.FRONTEND_URL?.split(",") || ["https://eventmanagementprojectclient.vercel.app"];//localhost channged to https://eventmanagementprojectbackend.vercel.app/
 app.use(cors({
-    origin: allowedOrigins,
-    credentials: true,
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    allowedHeaders: "Content-Type,Authorization"
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: "Content-Type,Authorization",
 }));
 // ✅ Middleware
 app.use(cookieParser()); // 🔹 Parses cookies for authentication
