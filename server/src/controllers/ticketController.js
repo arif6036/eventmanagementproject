@@ -1,8 +1,7 @@
 const Ticket = require("../models/ticketModel");
 const Event = require("../models/eventModel");
 const QRCode = require("qrcode");
-const Stripe = require("stripe");
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); // ✅ Ensure Stripe Secret Key is in .env
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 // ✅ Create a new ticket (Admin Only)
 const createTicket = async (req, res) => {
