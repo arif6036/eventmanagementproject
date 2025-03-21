@@ -930,6 +930,11 @@ body {
 }
 .home-container {
   font-family: 'Segoe UI', sans-serif;
+  background-image: url("https://res.cloudinary.com/dwzlaebxh/image/upload/v1742402225/event-images/nuk8ux4ougbrqsllg6id.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
 }
 
 .event-card:hover {
