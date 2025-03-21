@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { getAllEvents } from "../api/eventApi";
-import { Container, Row, Col, Card, Button, Spinner } from "react-bootstrap";
+import { Container, Row, Col, Card, Button, Spinner, Badge } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Calendar, MapPin, Clock, Users, PlusCircle } from "lucide-react";
+import { Calendar, MapPin, Clock, PlusCircle } from "lucide-react";
 
 const Events = () => {
   const [events, setEvents] = useState([]);
@@ -26,19 +26,16 @@ const Events = () => {
       });
   }, []);
 
-  // Format date for better display
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString(undefined, {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
     });
   };
 
-  // Get time from date string
   const getTime = (dateString) => {
     return new Date(dateString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  // Navigate to Create Event Page
   const handleCreateEvent = () => {
     navigate("/create-event");
   };
@@ -47,7 +44,7 @@ const Events = () => {
     return (
       <Container className="text-center py-5">
         <Spinner animation="border" variant="primary" />
-        <p className="mt-3">Loading events...</p>
+        <p className="mt-3 text-muted">Loading events...</p>
       </Container>
     );
   }
@@ -55,9 +52,7 @@ const Events = () => {
   if (error) {
     return (
       <Container className="text-center py-5">
-        <div className="alert alert-danger" role="alert">
-          {error}
-        </div>
+        <div className="alert alert-danger">{error}</div>
         <Button variant="outline-primary" onClick={() => window.location.reload()}>
           Try Again
         </Button>
@@ -66,18 +61,15 @@ const Events = () => {
   }
 
   return (
-    <Container fluid className="py-5 bg-light">
+    <Container fluid className="bg-light py-5">
       <Container>
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="fw-bold">Upcoming Events</h2>
-          <div className="d-flex gap-2">
-            <Button variant="outline-secondary">Filter</Button>
-            {user?.role === "admin" && (
-              <Button variant="primary" onClick={handleCreateEvent}>
-                <PlusCircle size={16} className="me-2" /> Add Event
-              </Button>
-            )}
-          </div>
+          <h2 className="fw-bold text-dark">🌟 Upcoming Events</h2>
+          {user?.role === "admin" && (
+            <Button variant="success" onClick={handleCreateEvent}>
+              <PlusCircle size={18} className="me-2" /> Add Event
+            </Button>
+          )}
         </div>
 
         {events.length === 0 ? (
@@ -90,46 +82,47 @@ const Events = () => {
             )}
           </div>
         ) : (
-          <Row xs={1} md={2} lg={3} className="g-4">
+          <Row xs={1} sm={2} md={3} lg={4} className="g-4">
             {events.map(event => (
               <Col key={event._id}>
-                <Card className="h-100 shadow-sm hover-shadow border-0">
+                <Card className="h-100 border-0 shadow-sm rounded-4 overflow-hidden hover-shadow">
                   {event.image && (
-                    <div className="card-img-wrapper">
-                      <Card.Img
-                        variant="top"
-                        src={event.image || "/api/placeholder/400/200"}
-                        alt={event.title}
-                        className="event-image"
-                      />
-                    </div>
+                    <Card.Img
+                      variant="top"
+                      src={event.image}
+                      alt={event.title}
+                      style={{ height: "180px", objectFit: "cover" }}
+                    />
                   )}
                   <Card.Body>
-                    <Card.Title className="fw-bold">{event.title}</Card.Title>
-                    <div className="mb-3">
-                      <div className="d-flex align-items-center text-muted mb-2">
+                    <Badge bg="info" className="mb-2">{event.category || "General"}</Badge>
+                    <Card.Title className="fw-bold text-dark">{event.title}</Card.Title>
+                    <div className="text-muted small">
+                      <div className="mb-1 d-flex align-items-center">
                         <Calendar size={16} className="me-2" />
-                        <small>{formatDate(event.date)}</small>
+                        {formatDate(event.date)}
                       </div>
-                      <div className="d-flex align-items-center text-muted mb-2">
+                      <div className="mb-1 d-flex align-items-center">
                         <Clock size={16} className="me-2" />
-                        <small>{getTime(event.date)}</small>
+                        {getTime(event.date)}
                       </div>
-                      <div className="d-flex align-items-center text-muted">
+                      <div className="mb-1 d-flex align-items-center">
                         <MapPin size={16} className="me-2" />
-                        <small>{event.venue}</small>
+                        {event.venue}
                       </div>
                     </div>
-                    <Card.Footer className="bg-white border-0 pt-0">
-                      <div className="d-grid gap-2">
-                        <Link to={`/events/${event._id}`} className="text-decoration-none">
-                          <Button variant="outline-primary" size="sm" className="w-100">
-                            View Details
-                          </Button>
-                        </Link>
-                      </div>
-                    </Card.Footer>
                   </Card.Body>
+                  <Card.Footer className="bg-white border-0">
+                    <Button
+                      as={Link}
+                      to={`/events/${event._id}`}
+                      variant="outline-primary"
+                      size="sm"
+                      className="w-100 fw-semibold"
+                    >
+                      View Details
+                    </Button>
+                  </Card.Footer>
                 </Card>
               </Col>
             ))}
