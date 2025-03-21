@@ -18,8 +18,12 @@ connectDB();
 const app = express();
 
 // ✅ CORS Configuration
-const allowedOrigins = process.env.FRONTEND_URL?.split(",") || [
-  "https://eventmanagementprojectclient.vercel.app",
+// const allowedOrigins = process.env.FRONTEND_URL?.split(",") || [
+//   "https://eventmanagementprojectclient.vercel.app",
+// ];
+const allowedOrigins = [
+  "https://eventmanagementprojectclient.vercel.app", // ✅ your frontend domain
+  "http://localhost:5173", // optional for local dev
 ];
 
 app.use(
