@@ -19,7 +19,7 @@ connectDB();
 const app = express();
 
 // ✅ CORS Middleware (Dynamically from .env)
-const allowedOrigins = process.env.FRONTEND_URL?.split(",") || ["http://localhost:5173"];
+const allowedOrigins = process.env.FRONTEND_URL?.split(",") || ["https://eventmanagementprojectbackend.vercel.app/"];//localhost channged to https://eventmanagementprojectbackend.vercel.app/
 app.use(cors({
     origin: allowedOrigins,
     credentials: true,
