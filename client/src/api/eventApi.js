@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = `${import.meta.env.VITE_BACKEND_URL}/api/events`;
+const API_URL = `${import.meta.env.VITE_BACKEND_URL}api/events`;//slash remove for axios
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
