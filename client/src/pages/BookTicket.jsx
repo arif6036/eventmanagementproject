@@ -55,41 +55,58 @@ const BookTicket = () => {
       return;
     }
   
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Authentication error. Please login again.");
+      navigate("/login");
+      return;
+    }
+  
     try {
       setBookingInProgress(true);
-      
-      // ✅ Fetch Token from Local Storage
-      const token = localStorage.getItem("token");
-      if (!token) {
-        toast.error("Authentication error. Please login again.");
-        navigate("/login");
+  
+      // ✅ If ticket is FREE, skip payment and confirm booking
+      if (totalPrice === 0) {
+        const ticketData = { ticketType: "Free", price: 0, userId, quantity };
+        const bookingResponse = await confirmBooking(id, ticketData, token);
+        if (!bookingResponse) throw new Error("Booking confirmation failed.");
+  
+        toast.success("Free ticket booked successfully!");
+        navigate("/my-tickets");
         return;
       }
   
-      console.log("Total Price Before Payment:", totalPrice); // ✅ Debugging log
-  
-      if (totalPrice < 0.5) {
-        toast.error("Payment amount is too low. Minimum is $0.50 USD.");
-        setBookingInProgress(false);
-        return;
-      }
-  
-      // ✅ Step 1: Initiate Payment
+      // ✅ For paid tickets, proceed with payment
       const paymentResponse = await initiatePayment({
         eventId: id,
         amount: totalPrice,
-        userId, // ✅ Ensure userId is sent
+        userId,
         quantity,
       });
   
-      if (!paymentResponse.success || !paymentResponse.paymentUrl) {
+      if (!paymentResponse.success || !paymentResponse.clientSecret) {
         throw new Error(paymentResponse.message || "Payment Failed");
       }
+  
+      
+      // Or open external `paymentResponse.paymentUrl` if you're using Checkout Links
+      window.location.href = paymentResponse.paymentUrl;
+  
+      // Optional: If you use Stripe Checkout and handle redirect on backend,
+      // remove the confirmBooking call here.
+  
+    } catch (error) {
+      setBookingInProgress(false);
+      const message = error.response?.data?.message || error.message || "Booking failed. Please try again.";
+      setError(message);
+      toast.error(message);
+    }
+  };
   
       // ✅ Step 2: Confirm Booking
       const ticketData = { ticketType: "Standard", price: totalPrice, userId, quantity };
       const bookingResponse = await confirmBooking(id, ticketData, token);
-  
+  try{
       if (!bookingResponse) {
         throw new Error("Booking confirmation failed.");
       }

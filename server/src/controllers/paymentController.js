@@ -49,7 +49,7 @@ const confirmBooking = async (req, res) => {
       price,
       quantity,
     });
-
+console.log("Confirm Booking Request:")
     if (!userId) {
       return res.status(400).json({ message: "User authentication failed. Please login again." });
     }
