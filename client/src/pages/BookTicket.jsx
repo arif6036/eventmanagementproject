@@ -63,6 +63,12 @@ const BookTicket = () => {
         userId,
         quantity
       });
+      console.log(" Payment Request Payload", {
+        eventId: id,
+        amount: totalPrice,
+        userId,
+        quantity,
+      });
 
       if (response?.paymentUrl) {
         window.location.href = response.paymentUrl;

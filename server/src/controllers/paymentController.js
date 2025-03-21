@@ -35,6 +35,7 @@ const initiatePayment = async (req, res) => {
   }
 };
 
+
 // ✅ Confirm Booking After Payment Success
 const confirmBooking = async (req, res) => {
   try {
@@ -74,6 +75,8 @@ console.log("Confirm Booking Request:")
 const initiateStripeCheckout = async (req, res) => {
   const { amount, eventId, userId, quantity } = req.body;
 
+  console.log("🔍 Stripe Checkout Request:", { amount, eventId, userId, quantity });
+
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -84,7 +87,7 @@ const initiateStripeCheckout = async (req, res) => {
             product_data: {
               name: `Event Ticket for ${eventId}`,
             },
-            unit_amount: amount * 100, // convert to cents
+            unit_amount: amount * 100,
           },
           quantity,
         },
@@ -100,10 +103,11 @@ const initiateStripeCheckout = async (req, res) => {
 
     res.status(200).json({ success: true, paymentUrl: session.url });
   } catch (error) {
-    console.error("Stripe Checkout Error:", error.message);
+    console.error("❌ Stripe Checkout Error:", error);
     res.status(500).json({ success: false, message: "Stripe Checkout failed" });
   }
 };
+
 
 
 
