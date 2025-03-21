@@ -1,16 +1,16 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const connectDB = require("./src/config/db");
+const connectDB = require("../src/config/db");
 const cookieParser = require("cookie-parser");
 
 
 // Import Routes
-const userRoutes = require("./src/routes/userRoutes");
-const eventRoutes = require("./src/routes/eventRoutes");
-const ticketRoutes = require("./src/routes/ticketRoutes");
-const reviewRoutes = require("./src/routes/reviewRoutes");
-const paymentRoutes = require("./src/routes/paymentRoutes");
+const userRoutes = require("../src/routes/userRoutes");
+const eventRoutes = require("../src/routes/eventRoutes");
+const ticketRoutes = require("../src/routes/ticketRoutes");
+const reviewRoutes = require("../src/routes/reviewRoutes");
+const paymentRoutes = require("../src/routes/paymentRoutes");
 
 // ✅ Connect to Database
 connectDB();
