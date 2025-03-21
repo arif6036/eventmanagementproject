@@ -48,12 +48,19 @@ const HomePage = () => {
     <div className="home-container">
       {/* Cover Section */}
       <motion.section
-        className="cover-section d-flex flex-column justify-content-center align-items-center text-center py-5"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.2 }}
-        style={{ background: "linear-gradient(to right, #005f3f, #013220)", color: "#fff", minHeight: "70vh" }}
-      >
+  className="cover-section d-flex flex-column justify-content-center align-items-center text-center py-5"
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  transition={{ duration: 1.2 }}
+  style={{
+    backgroundImage: `linear-gradient(to right, rgba(0, 95, 63, 0.85), rgba(1, 50, 32, 0.85)), url("https://res.cloudinary.com/dwzlaebxh/image/upload/v1742402225/event-images/nuk8ux4ougbrqsllg6id.jpg")`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    color: "#fff",
+    minHeight: "70vh"
+  }}
+>
         <h1 className="display-4 fw-bold mb-3">Discover & Book Your Next Experience</h1>
         <p className="lead mb-4">Find amazing events, book tickets, and create unforgettable moments.</p>
         <div className="d-flex flex-wrap gap-3 justify-content-center">
