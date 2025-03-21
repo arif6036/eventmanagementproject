@@ -134,26 +134,23 @@ export const initiatePayment = async (paymentData) => {
   }
 };
 
-
-
-// ✅ Confirm Ticket Booking After Payment
 export const confirmBooking = async (eventId, ticketData, token) => {
   try {
-    console.log("Confirming Booking - Data Sent:", ticketData); // Debugging Log
-
-    const response = await axios.post(`${API_URL}/${eventId}/book`, ticketData, {
-      headers: { 
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}` 
-      },
-      withCredentials: true,
-    });
-
-    console.log("Booking Confirmed:", response.data);
+    const response = await axios.post(
+      `${API_URL}/${eventId}/book`,
+      ticketData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error confirming booking:", error.response?.data || error.message);
-    throw error.response?.data || error.message;
+    throw error.response?.data || error;
   }
 };
 
