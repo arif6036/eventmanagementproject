@@ -33,6 +33,10 @@ app.use(express.urlencoded({ extended: true })); // 🔹 Parses URL-encoded bodi
 
 
 // ✅ Routes
+app.get("/", (req, res) => {
+  res.send("API is running"); 
+});
+
 app.use("/api/payment", paymentRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/events", eventRoutes);
