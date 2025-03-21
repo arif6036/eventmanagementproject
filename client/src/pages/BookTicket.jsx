@@ -5,7 +5,7 @@ import { initiatePayment, confirmBooking } from "../api/ticketApi";
 import { Container, Card, Button, Form, Row, Col, Alert, Spinner } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { Calendar, Clock, MapPin, ArrowLeft } from "lucide-react";
+import { Calendar, Clock, MapPin, ArrowLeft, CreditCard } from "lucide-react";
 
 const BookTicket = () => {
   const { id } = useParams();
@@ -31,12 +31,9 @@ const BookTicket = () => {
       .then((data) => {
         setEvent(data);
         setTotalPrice(data.ticketPrice || 0);
-        setLoading(false);
       })
-      .catch(() => {
-        setError("Error fetching event details");
-        setLoading(false);
-      });
+      .catch(() => setError("Error fetching event details"))
+      .finally(() => setLoading(false));
   }, [id, user, navigate]);
 
   useEffect(() => {
@@ -65,7 +62,7 @@ const BookTicket = () => {
     try {
       setBookingInProgress(true);
 
-      // ✅ FREE ticket booking
+      // ✅ Free ticket booking
       if (totalPrice === 0) {
         const ticketData = { ticketType: "Free", price: 0, userId, quantity };
         const bookingResponse = await confirmBooking(id, ticketData, token);
@@ -76,38 +73,33 @@ const BookTicket = () => {
         return;
       }
 
-      // ✅ PAID ticket - initiate payment
+      // ✅ Paid ticket - initiate Stripe payment
       const paymentResponse = await initiatePayment({
         eventId: id,
         amount: totalPrice,
         userId,
         quantity,
       });
-      
+
       if (paymentResponse?.paymentUrl) {
-        window.location.href = paymentResponse.paymentUrl; // ✅ Redirect to Stripe Checkout
+        window.location.href = paymentResponse.paymentUrl;
       } else {
         throw new Error("Failed to initiate payment.");
       }
 
-      // ✅ Redirect to Stripe Checkout
-      window.location.href = paymentResponse.paymentUrl;
-
     } catch (error) {
-      setBookingInProgress(false);
       const message = error.response?.data?.message || error.message || "Booking failed. Please try again.";
       setError(message);
       toast.error(message);
+    } finally {
+      setBookingInProgress(false);
     }
   };
 
   if (loading) {
     return (
       <Container className="d-flex justify-content-center align-items-center min-vh-100">
-        <div className="text-center">
-          <Spinner animation="border" variant="primary" />
-          <p className="mt-3 text-muted">Loading event details...</p>
-        </div>
+        <Spinner animation="border" variant="primary" />
       </Container>
     );
   }
@@ -125,33 +117,71 @@ const BookTicket = () => {
 
   return (
     <Container className="py-5">
-      <Row>
-        <Col md={8}>
-          <Card>
-            <Card.Body>
-              <h2>{event.title}</h2>
-              <p><Calendar /> {event.date}</p>
-              <p><Clock /> {event.time}</p>
-              <p><MapPin /> {event.venue}</p>
-            </Card.Body>
+      <Row className="justify-content-center">
+        <Col md={10}>
+          <Card className="shadow-lg border-0 rounded-4 p-4">
+            <Row className="g-4">
+              {/* Event Details */}
+              <Col md={7}>
+                <h2 className="fw-bold text-primary mb-3">{event.title}</h2>
+                <p><Calendar className="me-2 text-success" /> {event.date}</p>
+                <p><Clock className="me-2 text-warning" /> {event.time}</p>
+                <p><MapPin className="me-2 text-danger" /> {event.venue}</p>
+                <p className="text-muted mt-4">
+                  {event.description || "Secure your seat before it’s gone!"}
+                </p>
+              </Col>
+
+              {/* Booking Form */}
+              <Col md={5} className="bg-light p-4 rounded">
+                <h5 className="text-center mb-4 fw-semibold">🎟️ Book Your Tickets</h5>
+
+                <Form onSubmit={handleBooking}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Number of Tickets</Form.Label>
+                    <Form.Control
+                      type="number"
+                      min="1"
+                      value={quantity}
+                      onChange={(e) => setQuantity(Number(e.target.value))}
+                      className="shadow-sm"
+                    />
+                  </Form.Group>
+
+                  <div className="mb-4 p-3 bg-white rounded shadow-sm border">
+                    <h5 className="mb-0">Total: <span className="text-success fw-bold">${totalPrice}</span></h5>
+                    <small className="text-muted">Includes standard admission</small>
+                  </div>
+
+                  <Button
+                    type="submit"
+                    variant="success"
+                    className="w-100 fw-bold"
+                    disabled={bookingInProgress}
+                  >
+                    {bookingInProgress ? (
+                      <>
+                        <Spinner
+                          as="span"
+                          animation="border"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                          className="me-2"
+                        />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="me-2" size={18} />
+                        Proceed to Payment
+                      </>
+                    )}
+                  </Button>
+                </Form>
+              </Col>
+            </Row>
           </Card>
-        </Col>
-        <Col md={4}>
-          <Form onSubmit={handleBooking}>
-            <Form.Group className="mb-3">
-              <Form.Label>Number of Tickets</Form.Label>
-              <Form.Control
-                type="number"
-                value={quantity}
-                min="1"
-                onChange={(e) => setQuantity(Number(e.target.value))}
-              />
-            </Form.Group>
-            <h4>Total Price: ${totalPrice}</h4>
-            <Button type="submit" disabled={bookingInProgress}>
-              {bookingInProgress ? "Processing..." : "Proceed to Payment"}
-            </Button>
-          </Form>
         </Col>
       </Row>
     </Container>
