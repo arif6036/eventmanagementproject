@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getEventById } from "../api/eventApi";
-import { initiatePayment } from "../api/ticketApi";
+//import { initiatePayment } from "../api/ticketApi";
+import { initiatePayment } from "../api/paymentapi";
 import { Container, Row, Col, Card, Button, Spinner, Alert } from "react-bootstrap";
 import { Calendar, Clock, MapPin, ArrowLeft, CreditCard } from "lucide-react";
 import { toast } from "react-toastify";

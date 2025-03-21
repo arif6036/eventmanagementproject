@@ -58,7 +58,7 @@ app.use("/api/payment", paymentRoutes);
 
 // ✅ Error Handling
 app.use((err, req, res, next) => {
-  console.error("❌ Server Error:", err.message);
+  console.error({message:" Server Error:",error: err.message});
   res
     .status(500)
     .json({ message: "Internal server error", error: err.message });
