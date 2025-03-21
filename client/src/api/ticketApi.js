@@ -113,7 +113,6 @@ export const checkInTicket = async (ticketId) => {
 };
 
 
-// ✅ Initiate Payment Before Booking
 export const initiatePayment = async (paymentData) => {
   try {
     const response = await axios.post(
@@ -133,6 +132,7 @@ export const initiatePayment = async (paymentData) => {
     throw error.response?.data || error.message;
   }
 };
+
 
 
 
