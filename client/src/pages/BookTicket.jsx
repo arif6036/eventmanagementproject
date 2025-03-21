@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getEventById } from "../api/eventApi";
-import { initiatePayment, confirmBooking } from "../api/ticketApi"; // ✅ Correct API Calls
+import { initiatePayment, confirmBooking } from "../api/ticketApi";
 import { Container, Card, Button, Form, Row, Col, Alert, Spinner } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { Calendar, Clock, MapPin, ArrowLeft, CreditCard, Users } from "lucide-react";
+import { Calendar, Clock, MapPin, ArrowLeft } from "lucide-react";
 
 const BookTicket = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
-  
+
   const [event, setEvent] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -47,54 +47,52 @@ const BookTicket = () => {
 
   const handleBooking = async (e) => {
     e.preventDefault();
-  
+
     const userId = user?._id || user?.id;
     if (!userId) {
       toast.error("User ID is missing. Please re-login.");
       navigate("/login");
       return;
     }
-  
+
     const token = localStorage.getItem("token");
     if (!token) {
       toast.error("Authentication error. Please login again.");
       navigate("/login");
       return;
     }
-  
+
     try {
       setBookingInProgress(true);
-  
-      // ✅ If ticket is FREE, skip payment and confirm booking
+
+      // ✅ FREE ticket booking
       if (totalPrice === 0) {
         const ticketData = { ticketType: "Free", price: 0, userId, quantity };
         const bookingResponse = await confirmBooking(id, ticketData, token);
         if (!bookingResponse) throw new Error("Booking confirmation failed.");
-  
+
         toast.success("Free ticket booked successfully!");
         navigate("/my-tickets");
         return;
       }
-  
-      // ✅ For paid tickets, proceed with payment
+
+      // ✅ PAID ticket - initiate payment
       const paymentResponse = await initiatePayment({
         eventId: id,
         amount: totalPrice,
         userId,
         quantity,
       });
-  
-      if (!paymentResponse.success || !paymentResponse.clientSecret) {
-        throw new Error(paymentResponse.message || "Payment Failed");
-      }
-  
       
-      // Or open external `paymentResponse.paymentUrl` if you're using Checkout Links
+      if (paymentResponse?.paymentUrl) {
+        window.location.href = paymentResponse.paymentUrl; // ✅ Redirect to Stripe Checkout
+      } else {
+        throw new Error("Failed to initiate payment.");
+      }
+
+      // ✅ Redirect to Stripe Checkout
       window.location.href = paymentResponse.paymentUrl;
-  
-      // Optional: If you use Stripe Checkout and handle redirect on backend,
-      // remove the confirmBooking call here.
-  
+
     } catch (error) {
       setBookingInProgress(false);
       const message = error.response?.data?.message || error.message || "Booking failed. Please try again.";
@@ -102,25 +100,7 @@ const BookTicket = () => {
       toast.error(message);
     }
   };
-  
-      // ✅ Step 2: Confirm Booking
-      const ticketData = { ticketType: "Standard", price: totalPrice, userId, quantity };
-      const bookingResponse = await confirmBooking(id, ticketData, token);
-  try{
-      if (!bookingResponse) {
-        throw new Error("Booking confirmation failed.");
-      }
-  
-      toast.success("Ticket booked successfully!");
-      navigate("/my-tickets");
-  
-    } catch (error) {
-      setBookingInProgress(false);
-      setError(error.response?.data?.message || "Failed to book ticket. Please try again.");
-      toast.error(error.response?.data?.message || "Booking failed. Please try again.");
-    }
-  };
-  
+
   if (loading) {
     return (
       <Container className="d-flex justify-content-center align-items-center min-vh-100">

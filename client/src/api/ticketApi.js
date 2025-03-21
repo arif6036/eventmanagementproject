@@ -116,23 +116,25 @@ export const checkInTicket = async (ticketId) => {
 // ✅ Initiate Payment Before Booking
 export const initiatePayment = async (paymentData) => {
   try {
-    console.log("Initiating Payment - Data Sent:", paymentData); // ✅ Debugging log
-
-    const response = await axios.post(`${API_URL}/payment`, paymentData, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      withCredentials: true,
-    });
+    const response = await axios.post(
+      `${API_URL}/payment/create-checkout-session`,
+      paymentData,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        withCredentials: true,
+      }
+    );
 
     console.log("Payment Response:", response.data); // ✅ Debugging log
     return response.data;
   } catch (error) {
     console.error("Payment Initiation Error:", error.response?.data || error.message);
-    throw error.response?.data || error.message;
+    throw error.response?.data || { message: error.message || "Payment failed." };
   }
 };
+
 
 export const confirmBooking = async (eventId, ticketData, token) => {
   try {
