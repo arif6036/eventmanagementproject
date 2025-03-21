@@ -83,9 +83,9 @@ const HomePage = () => {
           <Button variant="success" size="lg" onClick={() => navigate("/events")}>
             <FaCalendarAlt /> Explore Events
           </Button>
-          <Button variant="success" size="lg" onClick={() => navigate("/events")}>
+          {/* <Button variant="success" size="lg" onClick={() => navigate("/events")}>
             <FaTicketAlt /> Book Tickets
-          </Button>
+          </Button> */}
           <Button variant="success" size="lg" onClick={handleRegisterEvent}>
             <FaPlusCircle /> Register Event
           </Button>
