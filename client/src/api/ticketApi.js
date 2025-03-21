@@ -117,7 +117,7 @@ export const checkInTicket = async (ticketId) => {
 export const initiatePayment = async (paymentData) => {
   try {
     const response = await axios.post(
-      `${API_URL}/payment/create-checkout-session`,
+      `${import.meta.env.VITE_BACKEND_URL}/api/payment/create-checkout-session`,
       paymentData,
       {
         headers: {
@@ -127,13 +127,13 @@ export const initiatePayment = async (paymentData) => {
       }
     );
 
-    console.log("Payment Response:", response.data); // ✅ Debugging log
     return response.data;
   } catch (error) {
     console.error("Payment Initiation Error:", error.response?.data || error.message);
-    throw error.response?.data || { message: error.message || "Payment failed." };
+    throw error.response?.data || error.message;
   }
 };
+
 
 
 export const confirmBooking = async (eventId, ticketData, token) => {

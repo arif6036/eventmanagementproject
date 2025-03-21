@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getEventById } from "../api/eventApi";
-import { initiatePayment, confirmBooking } from "../api/ticketApi";
-import { Container, Card, Button, Form, Row, Col, Alert, Spinner } from "react-bootstrap";
-import { useSelector } from "react-redux";
-import { toast } from "react-toastify";
+import { initiatePayment } from "../api/ticketApi";
+import { Container, Row, Col, Card, Button, Spinner, Alert } from "react-bootstrap";
 import { Calendar, Clock, MapPin, ArrowLeft, CreditCard } from "lucide-react";
+import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 const BookTicket = () => {
   const { id } = useParams();
@@ -21,76 +21,56 @@ const BookTicket = () => {
 
   useEffect(() => {
     if (!user) {
-      toast.error("You must be logged in to book tickets.");
+      toast.error("Login required to book tickets.");
       navigate(`/login?redirect=/events/${id}/book`);
       return;
     }
 
-    setLoading(true);
     getEventById(id)
       .then((data) => {
         setEvent(data);
         setTotalPrice(data.ticketPrice || 0);
+        setLoading(false);
       })
-      .catch(() => setError("Error fetching event details"))
-      .finally(() => setLoading(false));
+      .catch(() => {
+        setError("Failed to load event details.");
+        setLoading(false);
+      });
   }, [id, user, navigate]);
 
   useEffect(() => {
-    if (event && event.ticketPrice) {
+    if (event?.ticketPrice) {
       setTotalPrice(event.ticketPrice * quantity);
     }
   }, [quantity, event]);
 
-  const handleBooking = async (e) => {
-    e.preventDefault();
-
-    const userId = user?._id || user?.id;
-    if (!userId) {
-      toast.error("User ID is missing. Please re-login.");
-      navigate("/login");
-      return;
-    }
-
+  const handleConfirmBooking = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
-      toast.error("Authentication error. Please login again.");
+      toast.error("Authentication failed. Please login again.");
       navigate("/login");
       return;
     }
+
+    const userId = user?._id || user?.id;
 
     try {
       setBookingInProgress(true);
 
-      // ✅ Free ticket booking
-      if (totalPrice === 0) {
-        const ticketData = { ticketType: "Free", price: 0, userId, quantity };
-        const bookingResponse = await confirmBooking(id, ticketData, token);
-        if (!bookingResponse) throw new Error("Booking confirmation failed.");
-
-        toast.success("Free ticket booked successfully!");
-        navigate("/my-tickets");
-        return;
-      }
-
-      // ✅ Paid ticket - initiate Stripe payment
-      const paymentResponse = await initiatePayment({
+      const response = await initiatePayment({
         eventId: id,
         amount: totalPrice,
         userId,
-        quantity,
+        quantity
       });
 
-      if (paymentResponse?.paymentUrl) {
-        window.location.href = paymentResponse.paymentUrl;
+      if (response?.paymentUrl) {
+        window.location.href = response.paymentUrl;
       } else {
-        throw new Error("Failed to initiate payment.");
+        toast.error("Failed to initiate payment.");
       }
-
-    } catch (error) {
-      const message = error.response?.data?.message || error.message || "Booking failed. Please try again.";
-      setError(message);
-      toast.error(message);
+    } catch (err) {
+      setError("Something went wrong. Try again.");
     } finally {
       setBookingInProgress(false);
     }
@@ -98,18 +78,19 @@ const BookTicket = () => {
 
   if (loading) {
     return (
-      <Container className="d-flex justify-content-center align-items-center min-vh-100">
-        <Spinner animation="border" variant="primary" />
+      <Container className="text-center py-5">
+        <Spinner animation="border" />
+        <p className="mt-3 text-muted">Loading event details...</p>
       </Container>
     );
   }
 
   if (error || !event) {
     return (
-      <Container className="py-5">
+      <Container className="text-center py-5">
         <Alert variant="danger">{error || "Event not found"}</Alert>
-        <Button variant="outline-primary" as={Link} to="/events" className="mt-3">
-          <ArrowLeft size={16} className="me-2" /> Back to Events
+        <Button variant="outline-primary" as={Link} to="/events">
+          <ArrowLeft className="me-2" size={16} /> Back to Events
         </Button>
       </Container>
     );
@@ -117,70 +98,63 @@ const BookTicket = () => {
 
   return (
     <Container className="py-5">
-      <Row className="justify-content-center">
-        <Col md={10}>
-          <Card className="shadow-lg border-0 rounded-4 p-4">
-            <Row className="g-4">
-              {/* Event Details */}
-              <Col md={7}>
-                <h2 className="fw-bold text-primary mb-3">{event.title}</h2>
-                <p><Calendar className="me-2 text-success" /> {event.date}</p>
-                <p><Clock className="me-2 text-warning" /> {event.time}</p>
-                <p><MapPin className="me-2 text-danger" /> {event.venue}</p>
-                <p className="text-muted mt-4">
-                  {event.description || "Secure your seat before it’s gone!"}
-                </p>
-              </Col>
+      <Row className="align-items-start">
+        <Col md={6}>
+          <Card className="shadow-sm border-0 rounded-4">
+            <Card.Img variant="top" src={event.image} alt={event.title} style={{ height: 300, objectFit: "cover" }} />
+            <Card.Body>
+              <Card.Title className="fw-bold">{event.title}</Card.Title>
+              <p>{event.description}</p>
+              <p><Calendar className="me-2" /> {event.date}</p>
+              <p><Clock className="me-2" /> {event.time}</p>
+              <p><MapPin className="me-2" /> {event.venue}</p>
+              <p className="mb-0"><strong>Type:</strong> {event.eventType}</p>
+              <p><strong>Price:</strong> ${event.ticketPrice}</p>
+            </Card.Body>
+          </Card>
+        </Col>
 
-              {/* Booking Form */}
-              <Col md={5} className="bg-light p-4 rounded">
-                <h5 className="text-center mb-4 fw-semibold">🎟️ Book Your Tickets</h5>
+        <Col md={6}>
+          <Card className="shadow-sm p-4 rounded-4 bg-light">
+            <h4 className="mb-4">🎟️ Confirm Ticket</h4>
 
-                <Form onSubmit={handleBooking}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Number of Tickets</Form.Label>
-                    <Form.Control
-                      type="number"
-                      min="1"
-                      value={quantity}
-                      onChange={(e) => setQuantity(Number(e.target.value))}
-                      className="shadow-sm"
-                    />
-                  </Form.Group>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Quantity</label>
+              <input
+                type="number"
+                className="form-control"
+                value={quantity}
+                min={1}
+                onChange={(e) => setQuantity(Number(e.target.value))}
+              />
+            </div>
 
-                  <div className="mb-4 p-3 bg-white rounded shadow-sm border">
-                    <h5 className="mb-0">Total: <span className="text-success fw-bold">${totalPrice}</span></h5>
-                    <small className="text-muted">Includes standard admission</small>
-                  </div>
+            <div className="mb-4 p-3 border bg-white rounded">
+              <h5>Total: <span className="text-success">${totalPrice}</span></h5>
+            </div>
 
-                  <Button
-                    type="submit"
-                    variant="success"
-                    className="w-100 fw-bold"
-                    disabled={bookingInProgress}
-                  >
-                    {bookingInProgress ? (
-                      <>
-                        <Spinner
-                          as="span"
-                          animation="border"
-                          size="sm"
-                          role="status"
-                          aria-hidden="true"
-                          className="me-2"
-                        />
-                        Processing...
-                      </>
-                    ) : (
-                      <>
-                        <CreditCard className="me-2" size={18} />
-                        Proceed to Payment
-                      </>
-                    )}
-                  </Button>
-                </Form>
-              </Col>
-            </Row>
+            <Button
+              variant="success"
+              className="w-100 mb-2"
+              onClick={handleConfirmBooking}
+              disabled={bookingInProgress}
+            >
+              {bookingInProgress ? (
+                <Spinner size="sm" animation="border" className="me-2" />
+              ) : (
+                <CreditCard className="me-2" size={18} />
+              )}
+              {bookingInProgress ? "Processing..." : "Proceed to Payment"}
+            </Button>
+
+            <Button
+              variant="outline-secondary"
+              className="w-100"
+              as={Link}
+              to="/events"
+            >
+              <ArrowLeft className="me-2" size={18} /> Cancel and Go Back
+            </Button>
           </Card>
         </Col>
       </Row>
