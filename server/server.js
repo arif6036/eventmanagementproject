@@ -19,9 +19,24 @@ connectDB();
 const app = express();
 
 // ✅ CORS Middleware (Dynamically from .env)
-const allowedOrigins = process.env.FRONTEND_URL?.split(",") || ["https://eventmanagementprojectclient.vercel.app"];//localhost channged to https://eventmanagementprojectbackend.vercel.app/
+// const allowedOrigins = process.env.FRONTEND_URL?.split(",") || ["https://eventmanagementprojectclient.vercel.app"];//localhost channged to https://eventmanagementprojectbackend.vercel.app/
+// app.use(cors({
+//   origin: function (origin, callback) {
+//     if (!origin || allowedOrigins.includes(origin)) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error("Not allowed by CORS"));
+//     }
+//   },
+//   credentials: true,
+//   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+//   allowedHeaders: "Content-Type,Authorization",
+// }));
+const allowedOrigins = process.env.FRONTEND_URL?.split(",") || [];
+
 app.use(cors({
   origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps, curl, etc.)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -30,7 +45,7 @@ app.use(cors({
   },
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  allowedHeaders: "Content-Type,Authorization",
+  allowedHeaders: "Content-Type,Authorization"
 }));
 // ✅ Middleware
 app.use(cookieParser()); // 🔹 Parses cookies for authentication
