@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Button, Container, Row, Col, Card, Alert, Spinner } from "react-bootstrap";
-import { FaCalendarAlt, FaTicketAlt, FaPlusCircle } from "react-icons/fa";
+import { Button, Container, Row, Col, Card, Alert, Spinner, Badge } from "react-bootstrap";
+import { FaCalendarAlt, FaTicketAlt, FaPlusCircle, FaMapMarkerAlt, FaClock } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { getAllEvents } from "../api/eventApi";
 
@@ -48,35 +48,33 @@ const HomePage = () => {
     <div className="home-container">
       {/* Cover Section */}
       <motion.section
-  className="cover-section d-flex flex-column justify-content-center align-items-center text-center py-5"
-  initial={{ opacity: 0 }}
-  animate={{ opacity: 1 }}
-  transition={{ duration: 1.2 }}
-  style={{
-    backgroundImage: `linear-gradient(to right, rgba(0, 95, 63, 0.85), rgba(1, 50, 32, 0.85)), url("https://res.cloudinary.com/dwzlaebxh/image/upload/v1742402225/event-images/nuk8ux4ougbrqsllg6id.jpg")`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat",
-    color: "#fff",
-    minHeight: "70vh"
-  }}
->
-        <h1 className="display-4 fw-bold mb-3">Discover & Book Your Next Experience</h1>
-        <p className="lead mb-4">Find amazing events, book tickets, and create unforgettable moments.</p>
-        <div className="d-flex flex-wrap gap-3 justify-content-center">
-          <Button variant="light" size="lg" onClick={() => navigate("/events")}>
-            <FaCalendarAlt className="me-2" /> Explore Events
-          </Button>
-          <Button variant="outline-light" size="lg" onClick={handleRegisterEvent}>
-            <FaPlusCircle className="me-2" /> Register Event
-          </Button>
-        </div>
+        className="cover-section d-flex flex-column justify-content-center align-items-center text-center py-5"
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1.2 }}
+        style={{
+          backgroundImage: `linear-gradient(to right, rgba(0, 95, 63, 0.85), rgba(1, 50, 32, 0.85)), url("https://res.cloudinary.com/dwzlaebxh/image/upload/v1742402225/event-images/nuk8ux4ougbrqsllg6id.jpg")`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          color: "#fff",
+          minHeight: "75vh"
+        }}
+      >
+        <motion.h1 className="display-4 fw-bold mb-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}> Discover & Book Your Next Experience</motion.h1>
+        <motion.p className="lead mb-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
+          Find amazing events, book tickets, and create unforgettable moments.
+        </motion.p>
+        <motion.div className="d-flex flex-wrap gap-3 justify-content-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }}>
+          <Button variant="light" size="lg" onClick={() => navigate("/events")}> <FaCalendarAlt className="me-2" /> Explore Events </Button>
+          <Button variant="outline-light" size="lg" onClick={handleRegisterEvent}> <FaPlusCircle className="me-2" /> Register Event </Button>
+        </motion.div>
         {showPopup && <Alert variant="danger" className="mt-3">Only admins can register events!</Alert>}
       </motion.section>
 
       {/* Trending Events */}
       <Container className="py-5">
-        <h2 className="mb-4 text-center fw-semibold text-dark">🔥 Trending Events</h2>
+        <h2 className="mb-4 text-center fw-semibold text-dark animate__animated animate__fadeInUp">🔥 Trending Events</h2>
 
         {loading ? (
           <div className="text-center my-5">
@@ -89,33 +87,43 @@ const HomePage = () => {
           <p className="text-center text-muted">No events available.</p>
         ) : (
           <Row xs={1} md={2} lg={3} className="g-4">
-            {events.map((event) => (
+            {events.map((event, index) => (
               <Col key={event._id}>
-                <Card className="h-100 shadow-sm event-card border-0 rounded-4 overflow-hidden">
-                  <div className="overflow-hidden">
-                    <Card.Img
-                      variant="top"
-                      src={event.image || "/default-event.jpg"}
-                      alt={event.title}
-                      className="img-fluid"
-                      style={{ height: "200px", objectFit: "cover", transition: "transform 0.4s" }}
-                      onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-                      onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
-                    />
-                  </div>
-                  <Card.Body className="d-flex flex-column justify-content-between">
-                    <div>
-                      <Card.Title className="text-primary fw-bold">{event.title}</Card.Title>
-                      <Card.Text className="text-muted small mb-2">
-                        <FaCalendarAlt className="me-1" /> {new Date(event.date).toLocaleDateString()} <br />
-                        <FaTicketAlt className="me-1" /> {event.venue}
-                      </Card.Text>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="h-100 shadow-sm event-card border-0 rounded-4 overflow-hidden">
+                    <div className="overflow-hidden">
+                      <Card.Img
+                        variant="top"
+                        src={event.image || "/default-event.jpg"}
+                        alt={event.title}
+                        className="img-fluid"
+                        style={{ height: "200px", objectFit: "cover", transition: "transform 0.4s" }}
+                        onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                        onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                      />
                     </div>
-                    <Button variant="outline-primary" className="mt-3 w-100" onClick={() => navigate(`/events/${event._id}`)}>
-                      View Event
-                    </Button>
-                  </Card.Body>
-                </Card>
+                    <Card.Body className="d-flex flex-column justify-content-between">
+                      <div>
+                        <Card.Title className="text-primary fw-bold">{event.title}</Card.Title>
+                        <Card.Text className="text-muted small mb-2">
+                          <FaCalendarAlt className="me-1" /> {new Date(event.date).toLocaleDateString()} <br />
+                          <FaClock className="me-1" /> {event.time} <br />
+                          <FaMapMarkerAlt className="me-1" /> {event.venue}
+                        </Card.Text>
+                        <Badge bg={event.eventType === "paid" ? "success" : "secondary"} className="mb-2">
+                          {event.eventType.toUpperCase()}
+                        </Badge>
+                      </div>
+                      <Button variant="outline-primary" className="mt-3 w-100" onClick={() => navigate(`/events/${event._id}`)}>
+                        View Event
+                      </Button>
+                    </Card.Body>
+                  </Card>
+                </motion.div>
               </Col>
             ))}
           </Row>

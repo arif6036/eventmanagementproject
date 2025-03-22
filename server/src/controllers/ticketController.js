@@ -3,7 +3,7 @@ const Event = require("../models/eventModel");
 const QRCode = require("qrcode");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-// ✅ Create a new ticket (Admin Only)
+
 const createTicket = async (req, res) => {
   try {
     const { ticketType, price } = req.body;
@@ -20,7 +20,7 @@ const createTicket = async (req, res) => {
 
     const ticket = new Ticket({
       event: event._id,
-      user: req.user.id, // Assuming req.user contains logged-in user
+      user: req.user.id, 
       ticketType,
       price,
     });
@@ -32,15 +32,15 @@ const createTicket = async (req, res) => {
   }
 };
 
-// ✅ Process Payment (Using Stripe)
+
 const processPayment = async (req, res) => {
   try {
     const { amount, userId, eventId } = req.body;
 
-    // Create Payment Intent
+    
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount * 100, // Convert to cents
-      currency: "usd",
+      amount: amount * 100, 
+      currency: "INR",
       metadata: { userId, eventId },
     });
 
@@ -50,14 +50,12 @@ const processPayment = async (req, res) => {
   }
 };
 
-// ✅ Confirm Booking After Payment Success
+
 const confirmBooking = async (req, res) => {
   try {
     const { eventId } = req.params;
     const { ticketType, price, quantity } = req.body;
-
-    // ✅ Ensure user ID is included from the request (backend should get it from auth)
-    const userId = req.user?.id; // Extract user ID from authMiddleware
+    const userId = req.user?.id; 
 
     if (!userId) {
       return res.status(400).json({ message: "User authentication failed. Please login again." });
@@ -69,7 +67,7 @@ const confirmBooking = async (req, res) => {
 
     const ticket = new Ticket({
       event: eventId,
-      user: userId, // ✅ Attach the authenticated user ID
+      user: userId, 
       ticketType,
       price,
       quantity: quantity || 1,
@@ -84,13 +82,13 @@ const confirmBooking = async (req, res) => {
   }
 };
 
-// ✅ Get User's Tickets
+
 const getUserTickets = async (req, res) => {
   try {
     const tickets = await Ticket.find({ user: req.user.id }).populate("event", "title date venue");
 
     if (!tickets.length) {
-      return res.status(200).json([]); // ✅ Return empty array instead of 404 error
+      return res.status(200).json([]); 
     }
 
     res.json(tickets);
@@ -99,7 +97,7 @@ const getUserTickets = async (req, res) => {
   }
 };
 
-// ✅ Get All Bookings for an Event (Admin)
+
 const getEventBookings = async (req, res) => {
   try {
     const tickets = await Ticket.find({ event: req.params.id }).populate("user", "name email");
@@ -109,7 +107,7 @@ const getEventBookings = async (req, res) => {
   }
 };
 
-// ✅ Cancel Ticket (User)
+
 const cancelTicket = async (req, res) => {
   try {
     const ticket = await Ticket.findOneAndDelete({ _id: req.params.id, user: req.user.id });
@@ -124,7 +122,7 @@ const cancelTicket = async (req, res) => {
   }
 };
 
-// ✅ Generate Ticket (QR Code)
+
 const generateTicket = async (req, res) => {
   try {
     const ticket = await Ticket.findById(req.params.ticketId).populate("event", "name date venue");
@@ -144,7 +142,7 @@ const generateTicket = async (req, res) => {
   }
 };
 
-// ✅ Check-in Ticket (Event Staff)
+
 const checkInTicket = async (req, res) => {
   try {
     const ticket = await Ticket.findById(req.params.ticketId);
@@ -166,7 +164,7 @@ const checkInTicket = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-// ✅ Get All Tickets (Admin Only)
+
 const getAllTickets = async (req, res) => {
   try {
     const tickets = await Ticket.find().populate("event", "title date venue");
@@ -176,7 +174,6 @@ const getAllTickets = async (req, res) => {
   }
 };
 
-// ✅ Export Controllers
 module.exports = {
   processPayment,
   confirmBooking,

@@ -188,7 +188,7 @@ const NavigationBar = () => {
                 {/* Get Started Button */}
                 <Button 
                   as={Link} 
-                  to="/register" 
+                  to="/login" 
                   className="animated-button primary-btn"
                 >
                   <span className="button-text">Get Started</span>

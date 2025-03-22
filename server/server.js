@@ -13,7 +13,7 @@ const paymentRoutes = require("./src/routes/paymentRoutes");
 const cardRoutes = require("./src/routes/cardRoutes");
 // ✅ Connect to MongoDB
 connectDB();
-
+// const PORT = 5000; //remove while updating to vercel
 // ✅ Initialize Express App
 const app = express();
 
@@ -64,6 +64,8 @@ app.use((err, req, res, next) => {
     .status(500)
     .json({ message: "Internal server error", error: err.message });
 });
+// app.listen(PORT, () => {
+//   console.log(`Server is running on http://localhost:${PORT}`);
+// }); //remove while updating to vercel
 
-// ✅ Export for Vercel
 module.exports = app;

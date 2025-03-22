@@ -1,5 +1,5 @@
 const express = require("express");
-const { protect, adminOnly } = require("../middleware/authMiddleware");
+const { protect, adminOnly,verifyToken } = require("../middleware/authMiddleware");
 const {
   createCard,
   deleteCard,
@@ -17,6 +17,6 @@ router.put("/:id", protect, adminOnly, updateCard);     // Update Card
 router.delete("/:id", protect, adminOnly, deleteCard);  // Delete Card
 
 // ✅ Public Route (for validating card during ticket booking)
-router.post("/validate", protect, validateCard);        // Validate Card Details
-
+router.post("/validate", verifyToken, validateCard);
+// router.get("/ticket/:ticketId", protect, generateTicket);
 module.exports = router;

@@ -18,6 +18,7 @@ import ManageTickets from "../pages/ManageTickets";
 import { useSelector } from "react-redux"; 
 import CreateCard from "../pages/CreateCard";
 import ManageCards from "../pages/ManageCards";
+import TicketQRCode from "../pages/TicketQRCode"
 
 
 const PrivateRoute = ({ element }) => {
@@ -43,7 +44,7 @@ const AppRoutes = () => {
         <Route path="/admin/users" element={<ManageUsers />} />
         <Route path="/admin/events" element={<ManageEvents />} />
         <Route path="/admin/tickets" element={<ManageTickets />} />
-
+        <Route path="/ticket/:ticketId/qrcode" element={<TicketQRCode />} />
       {/* ✅ New Route: Protected Event Creation (Admin Only) */}
       <Route path="/dashboard/create-event" element={<ProtectedRoute><CreateEvent /></ProtectedRoute>} />
       <Route 

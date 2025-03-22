@@ -1,31 +1,47 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { generateTicket, checkInTicket } from "../api/ticketApi";
 import { Container, Card, Alert, Spinner, Button, Image } from "react-bootstrap";
 import { ArrowLeft, CheckCircle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const TicketQRCode = () => {
   const { ticketId } = useParams();
+  const navigate = useNavigate();
   const [ticket, setTicket] = useState(null);
   const [qrCode, setQrCode] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    generateTicket(ticketId)
-      .then((data) => {
+    const fetchTicket = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("No token found. Please login again.");
+        navigate("/login");
+        return;
+      }
+
+      try {
+        const data = await generateTicket(ticketId, token);
         setTicket(data.ticket);
         setQrCode(data.qrCode);
-      })
-      .catch(() => setError("Failed to generate QR code"))
-      .finally(() => setLoading(false));
-  }, [ticketId]);
+      } catch (err) {
+        setError("Failed to generate QR code");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTicket();
+  }, [ticketId, navigate]);
 
   const handleCheckIn = async () => {
     try {
-      await checkInTicket(ticketId);
+      const token = localStorage.getItem("token");
+      await checkInTicket(ticketId, token);
       setTicket((prev) => ({ ...prev, isCheckedIn: true }));
+      toast.success("Check-in successful!");
     } catch (error) {
       setError("Check-in failed. Try again.");
     }
@@ -53,9 +69,9 @@ const TicketQRCode = () => {
             <h4>Ticket QR Code</h4>
           </Card.Header>
           <Card.Body>
-            <h5>{ticket.event.name}</h5>
-            <p>Date: {new Date(ticket.event.date).toDateString()}</p>
-            <p>Venue: {ticket.event.venue}</p>
+            <h5>{ticket.event?.title || "Event"}</h5>
+            <p>Date: {new Date(ticket.event?.date).toDateString()}</p>
+            <p>Venue: {ticket.event?.venue}</p>
             <p>Type: {ticket.ticketType}</p>
             <p>Price: ${ticket.price}</p>
 

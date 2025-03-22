@@ -85,30 +85,38 @@ export const getEventBookings = async (eventId) => {
 };
 
 // Generate QR Code for a Ticket
-export const generateTicket = async (ticketId) => {
+export const generateTicket = async (ticketId, token) => {
   try {
-    const response = await axios.get(`${API_URL}/${ticketId}/qr`, {
-      headers: getAuthHeaders(),
+    const response = await axios.get(`${API_URL}/ticket/${ticketId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
       withCredentials: true,
     });
     return response.data;
   } catch (error) {
     console.error("Error generating ticket QR code:", error.response?.data || error.message);
-    throw error.response?.data || error.message;
+    throw error;
   }
 };
 
 // Check-in Ticket (Event Staff)
-export const checkInTicket = async (ticketId) => {
+export const checkInTicket = async (ticketId, token) => {
   try {
-    const response = await axios.post(`${API_URL}/${ticketId}/api/payment`, {}, {
-      headers: getAuthHeaders(),
-      withCredentials: true,
-    });
+    const response = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/api/tickets/ticket/${ticketId}/check-in`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ Make sure this token is valid
+        },
+        withCredentials: true,
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error checking in ticket:", error.response?.data || error.message);
-    throw error.response?.data || error.message;
+    throw error;
   }
 };
 

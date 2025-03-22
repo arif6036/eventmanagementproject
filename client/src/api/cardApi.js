@@ -40,3 +40,46 @@ export const validateCard = async (cardData) => {
     throw error.response?.data || error.message;
   }
 };
+export const deleteCard = async (cardId) => {
+  try {
+    const response = await axios.delete(`${API_URL}/${cardId}`, {
+      headers: {
+        ...getAuthHeaders(),
+      },
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("❌ Failed to delete card:", error.response?.data || error.message);
+    throw error.response?.data || error.message;
+  }
+};
+export const getAllCards = async () => {
+  try {
+    const response = await axios.get(API_URL, {
+      headers: {
+        ...getAuthHeaders(),
+      },
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("❌ Failed to fetch cards:", error.response?.data || error.message);
+    throw error.response?.data || error.message;
+  }
+};
+export const updateCard = async (cardId, updatedData) => {
+  try {
+    const response = await axios.put(`${API_URL}/${cardId}`, updatedData, {
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("❌ Failed to update card:", error.response?.data || error.message);
+    throw error.response?.data || error.message;
+  }
+};

@@ -701,7 +701,7 @@ body {
 }
 /* 🌿 Register Page Styling */
 .register-page {
-  background-color: #102a24; /* Dark Green Background */
+  background: url("../assets/hero-bg.jpg"); /* Dark Green Background */
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -755,7 +755,7 @@ body {
 }
 /* 🌿 Login Page Styling */
 .login-page {
-  background-color: #102a24; /* Dark Green Background */
+  background: url("../assets/hero-bg.jpg"); /* Dark Green Background */
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -766,9 +766,10 @@ body {
 .login-card {
   background-color: #1a3b33; /* Darker Green */
   color: white;
-  width: 400px;
+  opacity: 0.9;
+  width:500px;
   padding: 20px;
-  border-radius: 12px;
+  border-radius: 18px;
   box-shadow: 0px 10px 25px rgba(255, 255, 255, 0.1);
 }
 
