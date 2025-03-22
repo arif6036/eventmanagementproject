@@ -22,7 +22,7 @@ const app = express();
 //   "https://eventmanagementprojectclient.vercel.app",
 // ];
 const allowedOrigins = [
-  "https://eventmanagementprojectclient.vercel.app", // ✅ your frontend domain
+  "https://eventmanagementprojectfrontend.vercel.app", // ✅ your frontend domain
   "http://localhost:5173", // optional for local dev
 ];
 
