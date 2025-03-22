@@ -8,19 +8,13 @@ const getAuthHeaders = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-
-export const initiatePayment = async ({ eventId, amount, userId, quantity }) => {
+// ✅ Initiate payment using custom card system
+export const initiateCardPayment = async ({ eventId, amount, userId, quantity, cardDetails }) => {
   try {
     const token = localStorage.getItem("token");
-
     const response = await axios.post(
-      `${API_URL}/create-checkout-session`,
-      {
-        eventId,
-        amount,
-        userId,
-        quantity,
-      },
+      `${API_URL}/card-payment`,
+      { eventId, amount, userId, quantity, ...cardDetails },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -29,24 +23,22 @@ export const initiatePayment = async ({ eventId, amount, userId, quantity }) => 
         withCredentials: true,
       }
     );
-
-    console.log("✅ Stripe Checkout Response:", response.data);
     return response.data;
   } catch (error) {
-    console.error("❌ Payment Initiation Error:", error.response?.data || error.message);
+    console.error("❌ Card Payment Error:", error.response?.data || error.message);
     throw error.response?.data || error.message;
   }
 };
 
-// ✅ Confirm booking after successful payment
-export const confirmBooking = async (eventId, ticketData, token) => {
+// ✅ Confirm booking after payment success
+export const confirmBooking = async (eventId, ticketData) => {
   try {
     const response = await axios.post(
-      `${API_URL}/${eventId}/book`, // This assumes confirmBooking route is /api/payment/:eventId/book
+      `${API_URL}/${eventId}/book`,
       ticketData,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          ...getAuthHeaders(),
           "Content-Type": "application/json",
         },
         withCredentials: true,
@@ -54,8 +46,7 @@ export const confirmBooking = async (eventId, ticketData, token) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error confirming booking:", error.response?.data || error.message);
+    console.error("❌ Confirm Booking Error:", error.response?.data || error.message);
     throw error.response?.data || error;
   }
 };
-
