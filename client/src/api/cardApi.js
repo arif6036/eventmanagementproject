@@ -1,15 +1,27 @@
+// ticketApi.js or a new cardApi.js file
 import axios from "axios";
 
 const API_URL = `${import.meta.env.VITE_BACKEND_URL}/api/cards`;
 
-export const validateCard = async (cardData) => {
+const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
-  const response = await axios.post(`${API_URL}/validate`, cardData, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    withCredentials: true,
-  });
-  return response.data;
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+// ✅ Validate Card Before Booking
+export const validateCard = async (cardData) => {
+  try {
+    const response = await axios.post(`${API_URL}/validate`, cardData, {
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("❌ Card Validation Failed:", error.response?.data || error.message);
+    throw error.response?.data || error.message;
+  }
 };
