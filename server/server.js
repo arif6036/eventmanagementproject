@@ -10,7 +10,7 @@ const eventRoutes = require("./src/routes/eventRoutes");
 const ticketRoutes = require("./src/routes/ticketRoutes");
 const reviewRoutes = require("./src/routes/reviewRoutes");
 const paymentRoutes = require("./src/routes/paymentRoutes");
-
+const cardRoutes = require("./src/routes/cardRoutes");
 // ✅ Connect to MongoDB
 connectDB();
 
@@ -55,6 +55,7 @@ app.use("/api/events", eventRoutes);
 app.use("/api/tickets", ticketRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/cards", cardRoutes);
 
 // ✅ Error Handling
 app.use((err, req, res, next) => {

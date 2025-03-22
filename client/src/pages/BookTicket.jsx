@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getEventById } from "../api/eventApi";
-//import { initiatePayment } from "../api/ticketApi";
-import { initiatePayment } from "../api/paymentapi";
-import { Container, Row, Col, Card, Button, Spinner, Alert } from "react-bootstrap";
+import { validateCard, confirmBooking } from "../api/ticketApi";
+import { Container, Row, Col, Card, Button, Form, Alert, Spinner } from "react-bootstrap";
 import { Calendar, Clock, MapPin, ArrowLeft, CreditCard } from "lucide-react";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
@@ -19,6 +18,14 @@ const BookTicket = () => {
   const [loading, setLoading] = useState(true);
   const [bookingInProgress, setBookingInProgress] = useState(false);
   const [error, setError] = useState("");
+  const [cardDetails, setCardDetails] = useState({
+    cardHolderName: "",
+    cardNumber: "",
+    expiryDate: "",
+    cvv: "",
+    email: "",
+    mobile: ""
+  });
 
   useEffect(() => {
     if (!user) {
@@ -45,6 +52,11 @@ const BookTicket = () => {
     }
   }, [quantity, event]);
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCardDetails((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleConfirmBooking = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -54,30 +66,30 @@ const BookTicket = () => {
     }
 
     const userId = user?._id || user?.id;
-
     try {
       setBookingInProgress(true);
 
-      const response = await initiatePayment({
-        eventId: id,
-        amount: totalPrice,
-        userId,
-        quantity
-      });
-      console.log(" Payment Request Payload", {
-        eventId: id,
-        amount: totalPrice,
+      // Validate card
+      const validationRes = await validateCard(cardDetails);
+      if (!validationRes.success) throw new Error("Card validation failed");
+
+      // Confirm booking
+      const ticketData = {
+        ticketType: "Standard",
+        price: totalPrice,
         userId,
         quantity,
-      });
+      };
 
-      if (response?.paymentUrl) {
-        window.location.href = response.paymentUrl;
-      } else {
-        toast.error("Failed to initiate payment.");
-      }
+      const bookingRes = await confirmBooking(id, ticketData, token);
+
+      if (!bookingRes) throw new Error("Booking failed");
+
+      toast.success("Ticket booked successfully!");
+      navigate("/my-tickets");
     } catch (err) {
-      setError("Something went wrong. Try again.");
+      setError(err.message || "Something went wrong. Try again.");
+      toast.error(err.message || "Booking failed");
     } finally {
       setBookingInProgress(false);
     }
@@ -125,18 +137,42 @@ const BookTicket = () => {
           <Card className="shadow-sm p-4 rounded-4 bg-light">
             <h4 className="mb-4">🎟️ Confirm Ticket</h4>
 
-            <div className="mb-3">
-              <label className="form-label fw-semibold">Quantity</label>
-              <input
+            <Form.Group className="mb-3">
+              <Form.Label>Quantity</Form.Label>
+              <Form.Control
                 type="number"
-                className="form-control"
                 value={quantity}
                 min={1}
                 onChange={(e) => setQuantity(Number(e.target.value))}
               />
-            </div>
+            </Form.Group>
 
-            <div className="mb-4 p-3 border bg-white rounded">
+            <Form.Group className="mb-2">
+              <Form.Label>Card Holder Name</Form.Label>
+              <Form.Control name="cardHolderName" onChange={handleInputChange} />
+            </Form.Group>
+            <Form.Group className="mb-2">
+              <Form.Label>Card Number</Form.Label>
+              <Form.Control name="cardNumber" onChange={handleInputChange} />
+            </Form.Group>
+            <Form.Group className="mb-2">
+              <Form.Label>Expiry Date</Form.Label>
+              <Form.Control name="expiryDate" onChange={handleInputChange} placeholder="MM/YY" />
+            </Form.Group>
+            <Form.Group className="mb-2">
+              <Form.Label>CVV</Form.Label>
+              <Form.Control name="cvv" onChange={handleInputChange} />
+            </Form.Group>
+            <Form.Group className="mb-2">
+              <Form.Label>Email</Form.Label>
+              <Form.Control name="email" onChange={handleInputChange} />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Mobile</Form.Label>
+              <Form.Control name="mobile" onChange={handleInputChange} />
+            </Form.Group>
+
+            <div className="mb-3 p-3 border bg-white rounded">
               <h5>Total: <span className="text-success">${totalPrice}</span></h5>
             </div>
 
@@ -151,7 +187,7 @@ const BookTicket = () => {
               ) : (
                 <CreditCard className="me-2" size={18} />
               )}
-              {bookingInProgress ? "Processing..." : "Proceed to Payment"}
+              {bookingInProgress ? "Processing..." : "Confirm Ticket"}
             </Button>
 
             <Button
