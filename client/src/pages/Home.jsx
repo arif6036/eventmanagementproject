@@ -95,7 +95,7 @@ const HomePage = () => {
                   <div className="overflow-hidden">
                     <Card.Img
                       variant="top"
-                      src={event.image || "/default-event.jpg"}
+                      src={event.image || "./assets/hero=bg.jpg"}
                       alt={event.title}
                       className="img-fluid"
                       style={{ height: "200px", objectFit: "cover", transition: "transform 0.4s" }}
