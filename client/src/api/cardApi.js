@@ -8,6 +8,21 @@ const getAuthHeaders = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
+export const createCard = async (cardData) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.post(API_URL, cardData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error creating card:", error);
+    throw error;
+  }
+};
 // ✅ Validate Card Before Booking
 export const validateCard = async (cardData) => {
   try {
