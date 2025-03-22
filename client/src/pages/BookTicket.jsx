@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getEventById } from "../api/eventApi";
-import { validateCard, confirmBooking } from "../api/ticketApi";
+import { validateCard, confirmBooking } from "../api/paymentapi";
 import { Container, Row, Col, Card, Button, Form, Alert, Spinner } from "react-bootstrap";
 import { Calendar, Clock, MapPin, ArrowLeft, CreditCard } from "lucide-react";
 import { toast } from "react-toastify";
@@ -18,6 +18,7 @@ const BookTicket = () => {
   const [loading, setLoading] = useState(true);
   const [bookingInProgress, setBookingInProgress] = useState(false);
   const [error, setError] = useState("");
+
   const [cardDetails, setCardDetails] = useState({
     cardHolderName: "",
     cardNumber: "",
@@ -66,26 +67,26 @@ const BookTicket = () => {
     }
 
     const userId = user?._id || user?.id;
+
     try {
       setBookingInProgress(true);
 
-      // Validate card
+      // ✅ Step 1: Validate card details with backend
       const validationRes = await validateCard(cardDetails);
       if (!validationRes.success) throw new Error("Card validation failed");
 
-      // Confirm booking
+      // ✅ Step 2: Confirm booking
       const ticketData = {
         ticketType: "Standard",
         price: totalPrice,
         userId,
-        quantity,
+        quantity
       };
 
       const bookingRes = await confirmBooking(id, ticketData, token);
-
       if (!bookingRes) throw new Error("Booking failed");
 
-      toast.success("Ticket booked successfully!");
+      toast.success("🎉 Ticket booked successfully!");
       navigate("/my-tickets");
     } catch (err) {
       setError(err.message || "Something went wrong. Try again.");

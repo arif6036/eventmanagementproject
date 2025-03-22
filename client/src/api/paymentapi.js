@@ -50,3 +50,23 @@ export const confirmBooking = async (eventId, ticketData) => {
     throw error.response?.data || error;
   }
 };
+// ✅ Validate card before booking
+export const validateCard = async (cardData) => {
+  try {
+    const response = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/api/cards/validate`,
+      cardData,
+      {
+        headers: {
+          ...getAuthHeaders(),
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("❌ Card validation error:", error.response?.data || error.message);
+    throw error.response?.data || error.message;
+  }
+};
