@@ -16,6 +16,9 @@ import ManageUsers from "../pages/ManageUsers";
 import ManageEvents from "../pages/ManageEvents"; 
 import ManageTickets from "../pages/ManageTickets"; 
 import { useSelector } from "react-redux"; 
+import CreateCard from "../pages/CreateCard";
+import ManageCards from "../pages/ManageCards";
+
 
 const PrivateRoute = ({ element }) => {
   const { user } = useSelector((state) => state.auth);
@@ -59,12 +62,25 @@ const AppRoutes = () => {
           </PrivateRoute>
         } 
       /> */}
-    
+    {/* <Route
+  path="/admin/create-card"
+  element={<ProtectedRoute><CreateCard /></ProtectedRoute>}
+/> */}
+<Route 
+  path="/admin/create-card" 
+  element={
+    <PrivateRoute allowedRoles={["admin"]}>
+      <CreateCard />
+    </PrivateRoute>
+  }
+/>
+<Route path="/admin/cards" element={<PrivateRoute element={<ManageCards />} />} />
 
       {/* ✅ New Routes for Password Reset */}
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
     </Routes>
+    
   );
 };
 
