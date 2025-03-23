@@ -993,3 +993,16 @@ body {
   transition: all 0.3s ease-in-out;
 }
 
+.ticket-card {
+  max-width: 800px;
+  background-color: #ffffff;
+}
+
+.ticket-card h5,
+.ticket-card p {
+  color: #212529;
+}
+
+.qr-image {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}

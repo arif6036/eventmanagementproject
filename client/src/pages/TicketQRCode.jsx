@@ -1,7 +1,16 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { generateTicket, checkInTicket } from "../api/ticketApi";
-import { Container, Card, Alert, Spinner, Button, Image } from "react-bootstrap";
+import {
+  Container,
+  Card,
+  Alert,
+  Spinner,
+  Button,
+  Image,
+  Row,
+  Col,
+} from "react-bootstrap";
 import { ArrowLeft, CheckCircle } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -56,42 +65,62 @@ const TicketQRCode = () => {
   }
 
   return (
-    <Container className="mt-4">
-      <Link to="/admin/tickets" className="btn btn-link">
-        <ArrowLeft size={18} className="me-1" /> Back to Tickets
-      </Link>
+    <Container className="py-4">
+      <div className="mb-3">
+        <Link to="/admin/tickets" className="btn btn-outline-secondary btn-sm">
+          <ArrowLeft size={18} className="me-1" /> Back to Tickets
+        </Link>
+      </div>
 
       {error && <Alert variant="danger">{error}</Alert>}
 
       {ticket ? (
-        <Card className="text-center mt-4 shadow-sm">
-          <Card.Header className="bg-primary text-white">
-            <h4>Ticket QR Code</h4>
+        <Card className="shadow-lg border-0 rounded-4 ticket-card mx-auto">
+          <Card.Header className="bg-success text-white text-center rounded-top-4 py-3">
+            <h4 className="mb-0 fw-semibold">Event Ticket</h4>
           </Card.Header>
-          <Card.Body>
-            <h5>{ticket.event?.title || "Event"}</h5>
-            <p>Date: {new Date(ticket.event?.date).toDateString()}</p>
-            <p>Venue: {ticket.event?.venue}</p>
-            <p>Type: {ticket.ticketType}</p>
-            <p>Price: ${ticket.price}</p>
 
-            {qrCode ? (
-              <Image src={qrCode} alt="Ticket QR Code" fluid className="mb-3" />
-            ) : (
-              <Alert variant="warning">QR Code not available</Alert>
-            )}
+          <Card.Body className="p-4">
+            <Row className="align-items-center">
+              {/* Ticket Info */}
+              <Col xs={12} md={6} className="text-md-start text-center mb-4 mb-md-0">
+                <h5 className="fw-bold">{ticket.event?.title || "Event"}</h5>
+                <p className="mb-1">📅 Date: {new Date(ticket.event?.date).toDateString()}</p>
+                <p className="mb-1">📍 Venue: {ticket.event?.venue}</p>
+                <p className="mb-1">🎟 Type: {ticket.ticketType}</p>
+                <p className="mb-3">💰 Price: ${ticket.price}</p>
 
-            {ticket.isCheckedIn ? (
-              <Alert variant="success">
-                <CheckCircle size={18} className="me-2" />
-                Ticket Checked In
-              </Alert>
-            ) : (
-              <Button variant="success" onClick={handleCheckIn}>
-                <CheckCircle size={18} className="me-2" />
-                Check-In Ticket
-              </Button>
-            )}
+                {ticket.isCheckedIn ? (
+                  <Alert variant="success" className="d-inline-flex align-items-center">
+                    <CheckCircle size={18} className="me-2" />
+                    Checked In
+                  </Alert>
+                ) : (
+                  <Button variant="success" onClick={handleCheckIn}>
+                    <CheckCircle size={18} className="me-2" />
+                    Check-In Ticket
+                  </Button>
+                )}
+              </Col>
+
+              {/* QR Code */}
+              <Col xs={12} md={6} className="text-center">
+                {qrCode ? (
+                  <>
+                    <Image
+                      src={qrCode}
+                      alt="Ticket QR Code"
+                      fluid
+                      className="qr-image p-2 border rounded-3 bg-light"
+                      style={{ maxWidth: "250px" }}
+                    />
+                    <p className="mt-2 text-muted small">Scan at entry</p>
+                  </>
+                ) : (
+                  <Alert variant="warning">QR Code not available</Alert>
+                )}
+              </Col>
+            </Row>
           </Card.Body>
         </Card>
       ) : (
