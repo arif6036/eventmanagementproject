@@ -83,7 +83,43 @@ body {
   background-color: rgba(255, 255, 255, 0.95);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
+/* Navbar collapse button (hamburger) */
+.custom-toggler .toggler-icon {
+  display: block;
+  width: 22px;
+  height: 3px;
+  margin: 4px auto;
+  background-color: #fff;
+  transition: all 0.3s ease-in-out;
+}
 
+/* Animation on show */
+.navbar.loaded {
+  transition: all 0.3s ease-in-out;
+}
+
+@media (max-width: 991px) {
+  .navbar-collapse {
+    background-color: #1b5e20;
+    padding: 1rem;
+    border-radius: 0.5rem;
+  }
+
+  .nav-links-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav-item-wrapper {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .logout-btn,
+  .primary-btn {
+    width: 100%;
+  }
+}
 /* Brand logo animations */
 .brand-logo {
   display: flex;
@@ -100,7 +136,7 @@ body {
 }
 
 .brand-text {
-  color: #333;
+  color: #fffdfd;
 }
 
 .brand-accent {
@@ -138,7 +174,7 @@ body {
 
 /* Fancy animated nav links */
 .fancy-nav-link {
-  color: #555 !important;
+  color: #f8efef !important;
   font-weight: 500;
   padding: 10px 15px !important;
   position: relative;
