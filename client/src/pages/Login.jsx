@@ -1,15 +1,30 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { login } from "../features/authSlice";
-import { Form, Button, Container, Card, Row, Col, Alert } from "react-bootstrap";
+import {
+  Form,
+  Button,
+  Container,
+  Card,
+  Row,
+  Col,
+  Alert,
+} from "react-bootstrap";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import { FaEnvelope, FaLock, FaSignInAlt, FaUserPlus } from "react-icons/fa";
+import {
+  FaEnvelope,
+  FaLock,
+  FaSignInAlt,
+  FaUserPlus,
+} from "react-icons/fa";
 import "../styles/global.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -17,13 +32,39 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const redirectPath = new URLSearchParams(location.search).get("redirect") || "/dashboard";
+  const redirectPath =
+    new URLSearchParams(location.search).get("redirect") || "/dashboard";
+
+  // Validate email format
+  const validateEmail = (value) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!value.trim()) return "Email is required";
+    if (!regex.test(value)) return "Enter a valid email address";
+    return "";
+  };
+
+  // Validate password
+  const validatePassword = (value) => {
+    if (!value.trim()) return "Password is required";
+    if (value.length < 6)
+      return "Password should be at least 6 characters long";
+    return "";
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
 
+    // Validate before dispatch
+    const emailErr = validateEmail(email);
+    const passwordErr = validatePassword(password);
+
+    setEmailError(emailErr);
+    setPasswordError(passwordErr);
+
+    if (emailErr || passwordErr) return;
+
+    setLoading(true);
     try {
       const resultAction = await dispatch(login({ email, password }));
 
@@ -31,7 +72,10 @@ const Login = () => {
         toast.success("Login successful!");
 
         if (resultAction.payload.user) {
-          localStorage.setItem("user", JSON.stringify(resultAction.payload.user));
+          localStorage.setItem(
+            "user",
+            JSON.stringify(resultAction.payload.user)
+          );
         }
 
         navigate("/");
@@ -59,7 +103,7 @@ const Login = () => {
               <Card.Body className="p-4">
                 {error && <Alert variant="danger">{error}</Alert>}
 
-                <Form onSubmit={handleLogin}>
+                <Form noValidate onSubmit={handleLogin}>
                   <Form.Group className="mb-3">
                     <Form.Label>Email Address</Form.Label>
                     <div className="input-group">
@@ -70,16 +114,26 @@ const Login = () => {
                         type="email"
                         placeholder="Enter your email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          setEmailError(validateEmail(e.target.value));
+                        }}
+                        isInvalid={!!emailError}
                         required
                       />
+                      <Form.Control.Feedback type="invalid">
+                        {emailError}
+                      </Form.Control.Feedback>
                     </div>
                   </Form.Group>
 
                   <Form.Group className="mb-3">
                     <div className="d-flex justify-content-between">
                       <Form.Label>Password</Form.Label>
-                      <Link to="/forgot-password" className="text-warning text-decoration-none small">
+                      <Link
+                        to="/forgot-password"
+                        className="text-warning text-decoration-none small"
+                      >
                         Forgot Password?
                       </Link>
                     </div>
@@ -91,9 +145,16 @@ const Login = () => {
                         type="password"
                         placeholder="Enter your password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          setPasswordError(validatePassword(e.target.value));
+                        }}
+                        isInvalid={!!passwordError}
                         required
                       />
+                      <Form.Control.Feedback type="invalid">
+                        {passwordError}
+                      </Form.Control.Feedback>
                     </div>
                   </Form.Group>
 
@@ -105,7 +166,10 @@ const Login = () => {
                   >
                     {loading ? (
                       <>
-                        <span className="spinner-border spinner-border-sm me-2" role="status" />
+                        <span
+                          className="spinner-border spinner-border-sm me-2"
+                          role="status"
+                        />
                         Logging in...
                       </>
                     ) : (
@@ -120,7 +184,10 @@ const Login = () => {
 
               <Card.Footer className="text-center bg-light rounded-bottom-4 py-3">
                 <span className="text-dark">Don't have an account? </span>
-                <Link to="/register" className="text-success fw-bold text-decoration-none">
+                <Link
+                  to="/register"
+                  className="text-success fw-bold text-decoration-none"
+                >
                   <FaUserPlus className="me-1" /> Register Now
                 </Link>
               </Card.Footer>
