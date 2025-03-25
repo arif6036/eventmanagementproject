@@ -785,7 +785,12 @@ body {
   border-radius: 8px;
   transition: all 0.3s ease-in-out;
 }
-
+.form-control,
+.form-select {
+  background-color: #f8f9fa;
+  color: #212529;
+  border-radius: 0.3rem;
+}
 .btn-custom:hover {
   background-color: #1f573a; /* Darker Green */
   transform: scale(1.05);
