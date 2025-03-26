@@ -25,22 +25,26 @@ const app = express();
 // ];
 
 const allowedOrigins = [
-  "https://eventmanagementprojectfrontend.vercel.app", // Production frontend
-  "http://localhost:5173", // Local development
+  "https://eventmanagementprojectfrontend.vercel.app",
+  "http://localhost:5173",
+  /^https:\/\/eventmanagementprojectfrontend--.*\.vercel\.app$/
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.some(o =>
+      typeof o === "string" ? o === origin : o.test(origin)
+    )) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials: true, // Allows cookies/token headers to be sent
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE", // Accepts all common methods
-  allowedHeaders: ["Content-Type", "Authorization"] // Accepts necessary headers
+  credentials: true,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
 
 // ✅ Global Middleware
 app.use(cookieParser());
