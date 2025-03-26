@@ -26,8 +26,8 @@ const app = express();
 
 const allowedOrigins = [
   "https://eventmanagementprojectfrontend.vercel.app",
-  "http://localhost:5173",
-  /^https:\/\/eventmanagementprojectfrontend--.*\.vercel\.app$/
+  "https://eventmanagementprojectfrontend-fhfrl2t07.vercel.app",
+  "http://localhost:5173"
 ];
 
 app.use(cors({
