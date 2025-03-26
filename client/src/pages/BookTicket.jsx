@@ -37,6 +37,7 @@ const BookTicket = () => {
 
     getEventById(id)
       .then((data) => {
+        
         setEvent(data);
         setTotalPrice(data.ticketPrice || 0);
         setLoading(false);

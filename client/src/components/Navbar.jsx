@@ -160,7 +160,7 @@ const NavigationBar = () => {
                   </Nav.Link>
                 </div>
 
-                <div className="nav-item-wrapper">
+                {/* <div className="nav-item-wrapper">
                   <Nav.Link
                     as={Link}
                     to="/gallery"
@@ -169,7 +169,7 @@ const NavigationBar = () => {
                   >
                     Gallery <span className="hover-effect"></span>
                   </Nav.Link>
-                </div>
+                </div> */}
 
                 <Button
                   as={Link}

@@ -1,6 +1,7 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const Ticket = require("../models/ticketModel");
 const Event = require("../models/eventModel");
+const pusher = require("../config/pusher");
 
 // ✅ Initiate Stripe Payment
 const initiatePayment = async (req, res) => {
@@ -27,6 +28,11 @@ const initiatePayment = async (req, res) => {
     res.json({
       success: true,
       clientSecret: paymentIntent.client_secret,
+    });
+    //pusher
+    await pusher.trigger("event-channel", "new-notification", {
+      title: "Payment Started",
+      message: `A user has initiated payment for an event.`,
     });
 
   } catch (error) {
@@ -64,12 +70,22 @@ console.log("Confirm Booking Request:")
     });
 
     await ticket.save();
+
+// 🔔 Notify Admin
+await pusher.trigger("event-channel", "new-notification", {
+  title: "Ticket Booked",
+  message: `User ${userId} booked a ticket for event ${eventId}.`,
+});
+
+return res.status(201).json({ message: "Ticket booked successfully!", ticket });
+
     return res.status(201).json({ message: "Ticket booked successfully!", ticket });
   } catch (error) {
     console.error("Booking Error:", error);
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
 
 
 const initiateStripeCheckout = async (req, res) => {
@@ -101,9 +117,17 @@ const initiateStripeCheckout = async (req, res) => {
         eventId,
         userId,
       },
+      
     });
 
     res.status(200).json({ success: true, paymentUrl: session.url });
+    // 🔔 Notify Admin
+await pusher.trigger("event-channel", "new-notification", {
+  title: "Checkout Started",
+  message: `Checkout initiated for Event ID: ${eventId}`,
+});
+
+
   } catch (error) {
     console.error("❌ Stripe Checkout Error:", error.message);
     res.status(500).json({ success: false, message: "Stripe Checkout failed", error: error.message });

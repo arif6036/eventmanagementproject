@@ -5,6 +5,7 @@ import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { Users, Calendar, Ticket, Shield, CreditCard } from "lucide-react";
 import { toast } from "react-toastify";
 
+
 const Dashboard = () => {
   const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
@@ -77,7 +78,21 @@ const Dashboard = () => {
             </Card.Body>
           </Card>
         </Col>
+
+        <Col md={3}>
+          <Card className="shadow-sm h-100">
+            <Card.Body className="text-center">
+              <CreditCard size={40} />
+              <h5 className="mt-3">sendNotification</h5>
+              <p className="small">notify</p>
+              <Button as={Link} to="/admin/broadcast" variant="info" size="sm">
+                Go to Cards
+              </Button>
+            </Card.Body>
+          </Card>
+        </Col>
       </Row>
+      
     </Container>
   );
 };

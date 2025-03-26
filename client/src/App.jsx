@@ -4,7 +4,7 @@ import Footer from "./components/Footer";
 import { Container } from "react-bootstrap";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; 
-
+import NotificationListener from "./components/NotificationListener";
 
 function App() {
   return (
@@ -12,6 +12,7 @@ function App() {
       <NavigationBar />
       <Container>
         <AppRoutes /> 
+        <NotificationListener />
         <ToastContainer position="top-right" autoClose={3000} />
       </Container>
       <Footer />

@@ -174,6 +174,7 @@ const getAllTickets = async (req, res) => {
   }
 };
 
+
 module.exports = {
   processPayment,
   confirmBooking,

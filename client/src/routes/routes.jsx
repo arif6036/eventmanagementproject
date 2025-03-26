@@ -19,6 +19,7 @@ import { useSelector } from "react-redux";
 import CreateCard from "../pages/CreateCard";
 import ManageCards from "../pages/ManageCards";
 import TicketQRCode from "../pages/TicketQRCode"
+import AdminBroadcast from "../pages/AdminBroadcast";
 
 
 const PrivateRoute = ({ element }) => {
@@ -75,6 +76,8 @@ const AppRoutes = () => {
     </PrivateRoute>
   }
 />
+
+<Route path="/admin/broadcast" element={<AdminBroadcast />} /> 
 <Route path="/admin/cards" element={<PrivateRoute element={<ManageCards />} />} />
 
       {/* ✅ New Routes for Password Reset */}

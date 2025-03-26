@@ -3,6 +3,9 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./src/config/db");
 const cookieParser = require("cookie-parser");
+//const { json } = require("express");
+
+
 
 // Import Routes
 const userRoutes = require("./src/routes/userRoutes");
@@ -11,6 +14,7 @@ const ticketRoutes = require("./src/routes/ticketRoutes");
 const reviewRoutes = require("./src/routes/reviewRoutes");
 const paymentRoutes = require("./src/routes/paymentRoutes");
 const cardRoutes = require("./src/routes/cardRoutes");
+const notifyRoutes = require("./src/routes/notifyRoutes");
 // ✅ Connect to MongoDB
 connectDB();
 // const PORT = 5000; //remove while updating to vercel
@@ -56,10 +60,11 @@ app.use("/api/tickets", ticketRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/cards", cardRoutes);
+app.use("/api/notify", notifyRoutes); 
 
 // ✅ Error Handling
 app.use((err, req, res, next) => {
-  console.error({message:" Server Error:",error: err.message});
+  console.error({ message: " Server Error:", error: err.message });
   res
     .status(500)
     .json({ message: "Internal server error", error: err.message });
