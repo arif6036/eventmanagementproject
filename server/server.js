@@ -5,8 +5,6 @@ const connectDB = require("./src/config/db");
 const cookieParser = require("cookie-parser");
 //const { json } = require("express");
 
-
-
 // Import Routes
 const userRoutes = require("./src/routes/userRoutes");
 const eventRoutes = require("./src/routes/eventRoutes");
@@ -15,19 +13,20 @@ const reviewRoutes = require("./src/routes/reviewRoutes");
 const paymentRoutes = require("./src/routes/paymentRoutes");
 const cardRoutes = require("./src/routes/cardRoutes");
 const notifyRoutes = require("./src/routes/notifyRoutes");
-// ✅ Connect to MongoDB
+//  Connect to MongoDB
 connectDB();
 // const PORT = 5000; //remove while updating to vercel
-// ✅ Initialize Express App
+//  Initialize Express App
 const app = express();
 
-// ✅ CORS Configuration
+//  CORS Configuration
 // const allowedOrigins = process.env.FRONTEND_URL?.split(",") || [
 //   "https://eventmanagementprojectclient.vercel.app",
 // ];
+
 const allowedOrigins = [
-  "https://eventmanagementprojectfrontend.vercel.app", // ✅ your frontend domain
-  "http://localhost:5173", // optional for local dev
+  "https://eventmanagementprojectfrontend.vercel.app", // Production frontend
+  "http://localhost:5173", // Local development
 ];
 
 app.use(cors({
@@ -38,9 +37,9 @@ app.use(cors({
       callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials: true,
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  allowedHeaders: ["Content-Type", "Authorization"]
+  credentials: true, // Allows cookies/token headers to be sent
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE", // Accepts all common methods
+  allowedHeaders: ["Content-Type", "Authorization"] // Accepts necessary headers
 }));
 
 // ✅ Global Middleware
