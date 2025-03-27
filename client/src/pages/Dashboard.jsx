@@ -26,8 +26,8 @@ const Dashboard = () => {
       <Row className="g-4">
         {/* Manage Users */}
         <Col md={3}>
-          <Card className="shadow-sm h-100">
-            <Card.Body className="text-center">
+          <Card className="shadow-lg h-100 border-0 rounded-4">
+            <Card.Body className="text-center d-flex flex-column justify-content-center align-items-center">
               <Users size={40} />
               <h5 className="mt-3">Manage Users</h5>
               <p className="small">View, edit, and delete users.</p>
@@ -40,8 +40,8 @@ const Dashboard = () => {
 
         {/* Manage Events */}
         <Col md={3}>
-          <Card className="shadow-sm h-100">
-            <Card.Body className="text-center">
+          <Card className="shadow-lg h-100 border-0 rounded-4">
+            <Card.Body className="text-center d-flex flex-column justify-content-center align-items-center">
               <Calendar size={40} />
               <h5 className="mt-3">Manage Events</h5>
               <p className="small">Create, edit, and delete events.</p>
@@ -54,8 +54,8 @@ const Dashboard = () => {
 
         {/* Manage Tickets */}
         <Col md={3}>
-          <Card className="shadow-sm h-100">
-            <Card.Body className="text-center">
+          <Card className="shadow-lg h-100 border-0 rounded-4">
+            <Card.Body className="text-center d-flex flex-column justify-content-center align-items-center">
               <Ticket size={40} />
               <h5 className="mt-3">Manage Tickets</h5>
               <p className="small">View and manage ticket bookings.</p>
@@ -68,8 +68,8 @@ const Dashboard = () => {
 
         {/* Manage Cards */}
         <Col md={3}>
-          <Card className="shadow-sm h-100">
-            <Card.Body className="text-center">
+          <Card className="shadow-lg h-100 border-0 rounded-4">
+            <Card.Body className="text-center d-flex flex-column justify-content-center align-items-center">
               <CreditCard size={40} />
               <h5 className="mt-3">Manage Cards</h5>
               <p className="small">Administer stored card details.</p>
