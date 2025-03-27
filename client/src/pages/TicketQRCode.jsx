@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { generateTicket, checkInTicket } from "../api/ticketApi";
 import {
@@ -13,6 +13,8 @@ import {
 } from "react-bootstrap";
 import { ArrowLeft, CheckCircle } from "lucide-react";
 import { toast } from "react-toastify";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const TicketQRCode = () => {
   const { ticketId } = useParams();
@@ -21,6 +23,7 @@ const TicketQRCode = () => {
   const [qrCode, setQrCode] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const qrRef = useRef();
 
   useEffect(() => {
     const fetchTicket = async () => {
@@ -56,6 +59,25 @@ const TicketQRCode = () => {
     }
   };
 
+  const handleDownload = async () => {
+    const element = qrRef.current;
+    const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
+
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save("ticket.pdf");
+  };
+
   if (loading) {
     return (
       <Container className="d-flex justify-content-center align-items-center min-vh-100">
@@ -75,56 +97,64 @@ const TicketQRCode = () => {
       {error && <Alert variant="danger">{error}</Alert>}
 
       {ticket ? (
-        <Card className="shadow-lg border-0 rounded-4 ticket-card mx-auto">
-          <Card.Header className="bg-success text-white text-center rounded-top-4 py-3">
-            <h4 className="mb-0 fw-semibold">Event Ticket</h4>
-          </Card.Header>
+        <div ref={qrRef} className="p-3">
+          <Card className="shadow-lg border-0 rounded-4 ticket-card mx-auto">
+            <Card.Header className="bg-success text-white text-center rounded-top-4 py-3">
+              <h4 className="mb-0 fw-semibold">Event Ticket</h4>
+            </Card.Header>
 
-          <Card.Body className="p-4">
-            <Row className="align-items-center">
-              {/* Ticket Info */}
-              <Col xs={12} md={6} className="text-md-start text-center mb-4 mb-md-0">
-                <h5 className="fw-bold">{ticket.event?.title || "Event"}</h5>
-                <p className="mb-1">📅 Date: {new Date(ticket.event?.date).toDateString()}</p>
-                <p className="mb-1">📍 Venue: {ticket.event?.venue}</p>
-                <p className="mb-1">🎟 Type: {ticket.ticketType}</p>
-                <p className="mb-3">💰 Price: ${ticket.price}</p>
+            <Card.Body className="p-4">
+              <Row className="align-items-center">
+                <Col xs={12} md={6} className="text-md-start text-center mb-4 mb-md-0">
+                  <h5 className="fw-bold">{ticket.event?.title || "Event"}</h5>
+                  <p className="mb-1">📅 Date: {new Date(ticket.event?.date).toDateString()}</p>
+                  <p className="mb-1">📍 Venue: {ticket.event?.venue}</p>
+                  <p className="mb-1">🎟 Type: {ticket.ticketType}</p>
+                  <p className="mb-3">💰 Price: ${ticket.price}</p>
 
-                {ticket.isCheckedIn ? (
-                  <Alert variant="success" className="d-inline-flex align-items-center">
-                    <CheckCircle size={18} className="me-2" />
-                    Checked In
-                  </Alert>
-                ) : (
-                  <Button variant="success" onClick={handleCheckIn}>
-                    <CheckCircle size={18} className="me-2" />
-                    Check-In Ticket
-                  </Button>
-                )}
-              </Col>
+                  {ticket.isCheckedIn ? (
+                    <Alert variant="success" className="d-inline-flex align-items-center">
+                      <CheckCircle size={18} className="me-2" />
+                      Checked In
+                    </Alert>
+                  ) : (
+                    <Button variant="success" onClick={handleCheckIn}>
+                      <CheckCircle size={18} className="me-2" />
+                      Check-In Ticket
+                    </Button>
+                  )}
+                </Col>
 
-              {/* QR Code */}
-              <Col xs={12} md={6} className="text-center">
-                {qrCode ? (
-                  <>
-                    <Image
-                      src={qrCode}
-                      alt="Ticket QR Code"
-                      fluid
-                      className="qr-image p-2 border rounded-3 bg-light"
-                      style={{ maxWidth: "250px" }}
-                    />
-                    <p className="mt-2 text-muted small">Scan at entry</p>
-                  </>
-                ) : (
-                  <Alert variant="warning">QR Code not available</Alert>
-                )}
-              </Col>
-            </Row>
-          </Card.Body>
-        </Card>
+                <Col xs={12} md={6} className="text-center">
+                  {qrCode ? (
+                    <>
+                      <Image
+                        src={qrCode}
+                        alt="Ticket QR Code"
+                        fluid
+                        className="qr-image p-2 border rounded-3 bg-light"
+                        style={{ maxWidth: "250px" }}
+                      />
+                      <p className="mt-2 text-muted small">Scan at entry</p>
+                    </>
+                  ) : (
+                    <Alert variant="warning">QR Code not available</Alert>
+                  )}
+                </Col>
+              </Row>
+            </Card.Body>
+          </Card>
+        </div>
       ) : (
         <Alert variant="warning">Ticket not found</Alert>
+      )}
+
+      {ticket && (
+        <div className="text-center">
+          <Button onClick={handleDownload} variant="outline-primary" className="mt-3">
+            📥 Download Ticket as PDF
+          </Button>
+        </div>
       )}
     </Container>
   );

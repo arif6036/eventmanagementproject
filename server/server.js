@@ -13,9 +13,11 @@ const reviewRoutes = require("./src/routes/reviewRoutes");
 const paymentRoutes = require("./src/routes/paymentRoutes");
 const cardRoutes = require("./src/routes/cardRoutes");
 const notifyRoutes = require("./src/routes/notifyRoutes");
+const dashboardRoutes = require("./src/routes/dashboardRoutes");
+
 //  Connect to MongoDB
 connectDB();
-// const PORT = 5000; //remove while updating to vercel
+//  const PORT = 5000; //remove while updating to vercel
 //  Initialize Express App
 const app = express();
 
@@ -64,6 +66,8 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/cards", cardRoutes);
 app.use("/api/notify", notifyRoutes); 
+app.use("/api/dashboard",dashboardRoutes);
+
 
 // ✅ Error Handling
 app.use((err, req, res, next) => {

@@ -15,7 +15,11 @@
     "@stripe/stripe-js": "^6.1.0",
     "axios": "^1.8.3",
     "bootstrap": "^5.3.3",
+    "exceljs": "^4.4.0",
+    "file-saver": "^2.0.5",
     "framer-motion": "^12.5.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.1",
     "lucide-react": "^0.482.0",
     "pusher-js": "^8.4.0",
     "react": "^19.0.0",
@@ -26,7 +30,9 @@
     "react-router-bootstrap": "^0.26.3",
     "react-router-dom": "^7.3.0",
     "react-toastify": "^11.0.5",
-    "stripe": "^17.7.0"
+    "recharts": "^2.15.1",
+    "stripe": "^17.7.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

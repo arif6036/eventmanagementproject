@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { Users, Calendar, Ticket, Shield, CreditCard } from "lucide-react";
 import { toast } from "react-toastify";
+import { BarChart } from "lucide-react";
 
 
 const Dashboard = () => {
@@ -80,28 +81,40 @@ const Dashboard = () => {
         </Col>
 
         <Col md={3}>
-  <Card className="shadow-lg h-100 border-0 rounded-4">
-    <Card.Body className="text-center d-flex flex-column justify-content-center align-items-center">
-      <div className="bg-info bg-gradient p-3 rounded-circle d-inline-flex justify-content-center align-items-center">
-        <CreditCard size={32} className="text-white" />
-      </div>
-      <h5 className="mt-3 fw-bold">Push Notification</h5>
-      <p className="small text-muted">Send real-time messages to all users.</p>
-      <Button
-        as={Link}
-        to="/admin/broadcast"
-        variant="info"
-        className="mt-auto fw-semibold"
-        size="sm"
-      >
-        Send Notification
-      </Button>
-    </Card.Body>
-  </Card>
-</Col>
+          <Card className="shadow-lg h-100 border-0 rounded-4">
+            <Card.Body className="text-center d-flex flex-column justify-content-center align-items-center">
+              <div className="bg-info bg-gradient p-3 rounded-circle d-inline-flex justify-content-center align-items-center">
+                <CreditCard size={32} className="text-white" />
+              </div>
+              <h5 className="mt-3 fw-bold">Push Notification</h5>
+              <p className="small text-muted">Send real-time messages to all users.</p>
+              <Button
+                as={Link}
+                to="/admin/broadcast"
+                variant="info"
+                className="mt-auto fw-semibold"
+                size="sm"
+              >
+                Send Notification
+              </Button>
+            </Card.Body>
+          </Card>
+        </Col>
 
+        <Col md={3}>
+          <Card className="shadow-sm h-100">
+            <Card.Body className="text-center">
+              <BarChart size={40} />
+              <h5 className="mt-3">Analytics</h5>
+              <p className="small">Track stats and revenue</p>
+              <Button as={Link} to="/admin/analytics" variant="dark" size="sm">
+                View Analytics
+              </Button>
+            </Card.Body>
+          </Card>
+        </Col>
       </Row>
-      
+
     </Container>
   );
 };

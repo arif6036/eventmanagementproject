@@ -18,28 +18,40 @@ const Register = () => {
     name: "",
     email: "",
     password: "",
+    confirmPassword: "",
     role: "user",
   });
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState("");
   const navigate = useNavigate();
 
+  // ✅ Form Validation
   const validateForm = () => {
     const newErrors = {};
     if (!user.name.trim()) newErrors.name = "Name is required";
+
     if (!user.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!/^\S+@\S+\.\S+$/.test(user.email)) {
       newErrors.email = "Invalid email format";
     }
-    if (!user.password.trim()) {
+
+    if (!user.password) {
       newErrors.password = "Password is required";
     } else if (user.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
     }
+
+    if (!user.confirmPassword) {
+      newErrors.confirmPassword = "Please re-enter your password";
+    } else if (user.password !== user.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
     return newErrors;
   };
 
+  // ✅ Submit Handler
   const handleRegister = async (e) => {
     e.preventDefault();
     setFormError("");
@@ -49,7 +61,8 @@ const Register = () => {
     if (Object.keys(validationErrors).length > 0) return;
 
     try {
-      await registerUser(user);
+      const { confirmPassword, ...userData } = user; // exclude confirmPassword before sending
+      await registerUser(userData);
       toast.success("Registration successful! Please login.");
       navigate("/login");
     } catch (error) {
@@ -71,6 +84,7 @@ const Register = () => {
                 {formError && <Alert variant="danger">{formError}</Alert>}
 
                 <Form noValidate onSubmit={handleRegister}>
+                  {/* Full Name */}
                   <Form.Group className="mb-3">
                     <Form.Control
                       type="text"
@@ -86,6 +100,7 @@ const Register = () => {
                     </Form.Control.Feedback>
                   </Form.Group>
 
+                  {/* Email */}
                   <Form.Group className="mb-3">
                     <Form.Control
                       type="email"
@@ -101,6 +116,7 @@ const Register = () => {
                     </Form.Control.Feedback>
                   </Form.Group>
 
+                  {/* Password */}
                   <Form.Group className="mb-3">
                     <Form.Control
                       type="password"
@@ -116,20 +132,36 @@ const Register = () => {
                     </Form.Control.Feedback>
                   </Form.Group>
 
+                  {/* Confirm Password */}
+                  <Form.Group className="mb-3">
+                    <Form.Control
+                      type="password"
+                      placeholder="Re-enter Password"
+                      value={user.confirmPassword}
+                      onChange={(e) =>
+                        setUser({ ...user, confirmPassword: e.target.value })
+                      }
+                      isInvalid={!!errors.confirmPassword}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.confirmPassword}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
+                  {/* Role */}
                   <Form.Group className="mb-4">
                     <Form.Label className="text-light">Select Role</Form.Label>
                     <Form.Select
                       value={user.role}
-                      onChange={(e) =>
-                        setUser({ ...user, role: e.target.value })
+                      onChange={() =>
+                        setUser({ ...user, role: "user" }) // Locked to "user"
                       }
                     >
                       <option value="user">User</option>
-                      <option value="admin">Admin</option>
-                      <option value="organizer">Organizer</option>
                     </Form.Select>
                   </Form.Group>
 
+                  {/* Submit */}
                   <Button
                     type="submit"
                     variant="success"
