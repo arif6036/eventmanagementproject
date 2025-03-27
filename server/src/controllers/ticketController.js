@@ -2,7 +2,8 @@ const Ticket = require("../models/ticketModel");
 const Event = require("../models/eventModel");
 const QRCode = require("qrcode");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-
+const { sendEmail } = require("../config/emailService");
+const { ticketTemplate, paymentTemplate } = require("../config/emailTemplates");
 
 const createTicket = async (req, res) => {
   try {
@@ -27,6 +28,7 @@ const createTicket = async (req, res) => {
 
     await ticket.save();
     res.status(201).json({ message: "Ticket created successfully", ticket });
+    await sendEmail(user.email, "Your Ticket - EventEase", ticketTemplate(ticket));
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
@@ -75,7 +77,7 @@ const confirmBooking = async (req, res) => {
 
     await ticket.save();
     res.status(201).json({ message: "Ticket booked successfully!", ticket });
-
+    await sendEmail(user.email, "Payment Received - EventEase", paymentTemplate(ticket));
   } catch (error) {
     console.error("Booking Error:", error);
     res.status(500).json({ message: "Server Error", error: error.message });

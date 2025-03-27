@@ -82,10 +82,28 @@ export const requestPasswordReset = async (email) => {
 // ✅ Reset Password (Change Password Using Token)
 export const resetPassword = async (token, newPassword) => {
   try {
-    const response = await axios.post(`${API_URL}/reset-password/${token}`, { password: newPassword });
+    const response = await axios.post(
+      `${API_URL}/reset-password/${token}`,
+      { newPassword }, // ✅ use correct key
+      {
+        headers: {
+          "Content-Type": "application/json", // ✅ correctly passed
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Reset Password Error:", error.response?.data || error.message);
     throw error.response?.data || error;
   }
 };
+// export const requestPasswordReset = async (email) => {
+//   const response = await axios.post(`${API_URL}/forgot-password`, { email });
+//   return response.data;
+// };
+
+// ✅ Reset Password
+// export const resetPassword = async (token, newPassword) => {
+//   const response = await axios.post(`${API_URL}/reset-password/${token}`, { newPassword });
+//   return response.data;
+// };

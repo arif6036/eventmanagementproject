@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { generateTicket, checkInTicket } from "../api/ticketApi";
+import { downloadTicketPDF } from "../utils/pdfGenerator";
+
 import {
   Container,
   Card,
@@ -151,9 +153,16 @@ const TicketQRCode = () => {
 
       {ticket && (
         <div className="text-center">
-          <Button onClick={handleDownload} variant="outline-primary" className="mt-3">
+          {/* <Button onClick={handleDownload} variant="outline-primary" className="mt-3">
             📥 Download Ticket as PDF
-          </Button>
+          </Button> */}
+          <Button
+    variant="outline-success"
+    className="mt-3"
+    onClick={() => downloadTicketPDF(ticket, qrCode)}
+  >
+    📥 Download PDF Ticket
+  </Button>
         </div>
       )}
     </Container>

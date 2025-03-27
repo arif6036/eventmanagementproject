@@ -29,7 +29,8 @@ router.put("/change-password", protect, changePassword);
 
 // 🔹 Password Recovery Routes
 router.post("/forgot-password", forgotPassword);
-router.put("/reset-password/:token", resetPassword); // ✅ Changed to PUT (update action)
+router.put("/reset-password/:token", resetPassword); 
+router.post("/reset-password/:token", resetPassword);// ✅ Changed to PUT (update action)
 
 // 🔹 Admin-Only Routes
 router.get("/admin/dashboard", protect, adminOnly, (req, res) => {

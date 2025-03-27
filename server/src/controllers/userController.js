@@ -2,6 +2,9 @@ const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
+const { sendEmail } = require("../config/emailService");
+const { loginTemplate } = require("../config/emailTemplates");
+
 require('dotenv').config()
 
 const generateToken = (id) => {
@@ -58,7 +61,7 @@ const loginUser = async (req, res) => {
       }
   
       const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "7d" });
-  
+      await sendEmail(user.email, "Login Alert - EventEase", loginTemplate(user.name));
       res.json({
         message: "Login successful",
         token,
@@ -168,28 +171,57 @@ const changePassword = async (req, res) => {
 const resetPassword = async (req, res) => {
     const { token } = req.params;
     const { newPassword } = req.body;
-
+  
     try {
-        // Verify Token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.id);
-
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        // Hash New Password
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(newPassword, salt);
-
-        await user.save();
-
-        res.json({ message: "Password has been reset successfully. You can now log in with your new password." });
-
+      // ✅ Strong password validation
+      if (!newPassword || newPassword.length < 6) {
+        return res
+          .status(400)
+          .json({ message: "Password must be at least 6 characters" });
+      }
+  
+      if (!/[A-Z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+        return res.status(400).json({
+          message: "Password must contain at least one uppercase letter and one number",
+        });
+      }
+  
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.id);
+  
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(newPassword, salt);
+      await user.save();
+  
+      // ✅ Generate login token
+      const newToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "7d",
+      });
+  
+      // ✅ Send success response with user + token
+      res.json({
+        message: "Password has been reset successfully.",
+        token: newToken,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+      });
     } catch (error) {
-        res.status(400).json({ message: "Invalid or expired token" });
+      console.error("Reset Error:", error.message);
+      res.status(400).json({
+        message: "Invalid or expired token",
+        error: error.message,
+      });
     }
-};
+  };
+  
 
 
 // Forgot Password Function
@@ -205,43 +237,46 @@ const transporter = nodemailer.createTransport({
 // Forgot Password Function
 const forgotPassword = async (req, res) => {
     const { email } = req.body;
-
+  
     try {
-        const user = await User.findOne({ email });
-
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        // Generate Reset Token (expires in 1 hour)
-        const resetToken = jwt.sign(
-            { id: user._id },
-            process.env.JWT_SECRET,
-            { expiresIn: "1h" }
-        );
-
-        // Use Frontend URL for Reset Link
-        const resetLink = `http://localhost:5173/reset-password/${resetToken}`; //local host front end
-
-        // Send Email
-        await transporter.sendMail({
-            from: `"Event Management" <${process.env.EMAIL_USER}>`,
-            to: user.email,
-            subject: "Password Reset Request",
-            html: `
-                <p>Hello ${user.name},</p>
-                <p>You requested to reset your password. Click the link below to reset it:</p>
-                <a href="${resetLink}" style="background: #007bff; padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px;">Reset Password</a>
-                <p>This link will expire in 1 hour.</p>
-            `,
-        });
-
-        res.json({ message: "Password reset email sent. Please check your inbox." });
-
+      const user = await User.findOne({ email });
+  
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      // Generate Reset Token (expires in 1 hour)
+      const resetToken = jwt.sign(
+        { id: user._id },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+      );
+  
+      // Frontend reset page URL
+      const resetLink = `http://localhost:5173/reset-password/${resetToken}`;
+  
+      // ✅ Send reset email using utility
+      await sendEmail(
+        user.email,
+        "Password Reset Request",
+        `
+          <p>Hello ${user.name},</p>
+          <p>You requested to reset your password. Click the link below:</p>
+          <a href="${resetLink}" style="background: #198754; padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px;">
+            Reset Password
+          </a>
+          <p>This link will expire in 1 hour.</p>
+        `
+      );
+  
+      res.json({ message: "Password reset email sent. Please check your inbox." });
+  
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+      console.error("❌ Forgot Password Error:", error.message);
+      res.status(500).json({ message: "Server error", error: error.message });
     }
-};
+  };
+  
 
 const getAllUsers = async (req, res) => {
     try {
