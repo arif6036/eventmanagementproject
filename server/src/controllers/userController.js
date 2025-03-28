@@ -42,7 +42,8 @@ const registerUser = async (req, res) => {
         { expiresIn: "24h" }
       );
   
-      const verifyLink = `http://localhost:5173/verify-email/${verifyToken}`;
+      const verifyLink = `${process.env.CLIENT_URL}/verify-email/${verifyToken}`;
+
   
       // ✅ Send email
       await sendEmail(
@@ -273,7 +274,8 @@ const forgotPassword = async (req, res) => {
       );
   
       // Frontend reset page URL
-      const resetLink = `http://localhost:5173/reset-password/${resetToken}`;
+      const resetLink = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+
   
       // ✅ Send reset email using utility
       await sendEmail(
