@@ -8,6 +8,9 @@
 
       "source": "/reset-password/:token",
       "destination": "/*"
+    },
+    {
+      "source": "/(.*)", "destination": "/index.html"
     }
   ]
 }
