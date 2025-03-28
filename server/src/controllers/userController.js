@@ -13,39 +13,59 @@ const generateToken = (id) => {
 
 
 const registerUser = async (req, res) => {
-    const { name, email, password, role } = req.body; 
+    const { name, email, password, role } = req.body;
+  
     try {
-        const userExists = await User.findOne({ email });
-        if (userExists) {
-            return res.status(400).json({ message: "User already exists" });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Only allow role assignment if the first user is being registered
-        const isFirstUser = (await User.countDocuments()) === 0;
-        const assignedRole = isFirstUser ? "admin" : role || "user"; // First user is admin
-
-        const user = await User.create({
-            name,
-            email,
-            password: hashedPassword,
-            role: assignedRole, // Assign the role
-        });
-
-        res.status(201).json({
-            _id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role, // Send role in response
-            token: generateToken(user.id),
-        });
+      const userExists = await User.findOne({ email });
+      if (userExists) {
+        return res.status(400).json({ message: "User already exists" });
+      }
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      const isFirstUser = (await User.countDocuments()) === 0;
+      const assignedRole = isFirstUser ? "admin" : role || "user";
+  
+      // ✅ Create user as unverified
+      const user = await User.create({
+        name,
+        email,
+        password: hashedPassword,
+        role: assignedRole,
+        verified: false, // ✅
+      });
+  
+      // ✅ Generate email verification token (expires in 24h)
+      const verifyToken = jwt.sign(
+        { id: user._id },
+        process.env.JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+  
+      const verifyLink = `http://localhost:5173/verify-email/${verifyToken}`;
+  
+      // ✅ Send email
+      await sendEmail(
+        user.email,
+        "Verify your EventEase account",
+        `
+          <h3>Hi ${user.name},</h3>
+          <p>Thank you for registering. Please verify your email by clicking the link below:</p>
+          <a href="${verifyLink}" style="background: #198754; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">
+            Verify Email
+          </a>
+          <p>This link will expire in 24 hours.</p>
+        `
+      );
+  
+      // ✅ Send response to frontend
+      res.status(201).json({
+        message: "Registration successful! Please check your email to verify your account.",
+      });
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+      res.status(500).json({ message: "Server error", error: error.message });
     }
-};
-
-
+  };
 const loginUser = async (req, res) => {
     try {
       const { email, password } = req.body;

@@ -21,6 +21,7 @@ import ManageCards from "../pages/ManageCards";
 import TicketQRCode from "../pages/TicketQRCode"
 import AdminBroadcast from "../pages/AdminBroadcast";
 import AdminAnalytics from "../pages/AdminAnalytics";
+import VerifyPending from "../pages/VerifyPending";
 
 
 const PrivateRoute = ({ element }) => {
@@ -87,7 +88,7 @@ const AppRoutes = () => {
   
   }
 />
-
+<Route path="/verify-pending" element={<VerifyPending />} />
 <Route
   path="/admin/analytics"
   element={
