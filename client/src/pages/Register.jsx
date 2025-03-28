@@ -63,8 +63,9 @@ const Register = () => {
     try {
       const { confirmPassword, ...userData } = user; // exclude confirmPassword before sending
       await registerUser(userData);
-      toast.success("Registration successful! Please login.");
-      navigate("/login");
+toast.success("Registration successful! Please check your email to verify your account.");
+navigate("/verify-pending"); // 👈 redirect to a new page with instructions
+
     } catch (error) {
       console.error("Registration Error:", error);
       setFormError("Registration failed. Please try again.");
