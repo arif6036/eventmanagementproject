@@ -3,6 +3,11 @@
     {
       "source": "/(/.*)",
       "destination": "/*"
+    },
+    {
+
+      "source": "/reset-password/:token",
+      "destination": "/*"
     }
   ]
 }
