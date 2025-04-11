@@ -102,18 +102,41 @@ const Dashboard = () => {
         </Col>
 
         <Col md={3}>
-          <Card className="shadow-sm h-100">
-            <Card.Body className="text-center">
+          <Card className="shadow-lg h-100 border-0 rounded-4">
+            <Card.Body className="text-center d-flex flex-column justify-content-center align-items-center">
               <BarChart size={40} />
-              <h5 className="mt-3">Analytics</h5>
-              <p className="small">Track stats and revenue</p>
+              <h5 className="mt-3 fw-bold">Analytics</h5>
+              <p className="small text-muted">Track stats and revenue</p>
               <Button as={Link} to="/admin/analytics" variant="dark" size="sm">
                 View Analytics
               </Button>
             </Card.Body>
           </Card>
         </Col>
+
+        <Col md={3}>
+  <Card className="shadow-lg h-100 border-0 rounded-4">
+    <Card.Body className="text-center d-flex flex-column justify-content-center align-items-center">
+      <BarChart size={42} className="text-primary mb-2" />
+      <h5 className="fw-semibold mb-1">Review Management</h5>
+      <p className="text-muted small">Monitor customer feedback & reviews</p>
+      <Button
+        as={Link}
+        to="/admin/reviews"
+        variant="outline-dark"
+        size="sm"
+        className="mt-2"
+      >
+        View Reviews
+      </Button>
+    </Card.Body>
+  </Card>
+</Col>
+
+
       </Row>
+
+      
 
     </Container>
   );

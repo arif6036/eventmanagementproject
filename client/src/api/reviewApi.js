@@ -2,12 +2,26 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL + "/api/reviews";
 
+
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 // ✅ Create a new review
 export const createReview = async (eventId, reviewData) => {
-  const response = await axios.post(`${API_URL}/${eventId}`, reviewData, { withCredentials: true });
+  const response = await axios.post(
+    `${API_URL}/${eventId}`,
+    reviewData,
+    {
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json"
+      },
+      withCredentials: true,
+    }
+  );
   return response.data;
 };
-
 // ✅ Get all reviews for an event
 export const getReviewsByEvent = async (eventId) => {
   const response = await axios.get(`${API_URL}/${eventId}`);
@@ -16,7 +30,11 @@ export const getReviewsByEvent = async (eventId) => {
 
 // ✅ Get all reviews (Admin)
 export const getAllReviews = async () => {
-  const response = await axios.get(API_URL, { withCredentials: true });
+  const token = localStorage.getItem("token");
+  const response = await axios.get(API_URL, {
+    headers: { Authorization: `Bearer ${token}` },
+    withCredentials: true,
+  });
   return response.data;
 };
 

@@ -4,7 +4,8 @@ const Event = require("../models/eventModel");
 // ✅ 1️⃣ Add a Review
 const addReview = async (req, res) => {
   try {
-    const { eventId, rating, comment } = req.body;
+    const { rating, comment } = req.body;
+    const eventId = req.params.eventId; // ✅ Read eventId from URL instead
 
     if (!eventId || !rating || !comment) {
       return res.status(400).json({ message: "All fields are required" });

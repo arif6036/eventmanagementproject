@@ -22,6 +22,9 @@ import TicketQRCode from "../pages/TicketQRCode"
 import AdminBroadcast from "../pages/AdminBroadcast";
 import AdminAnalytics from "../pages/AdminAnalytics";
 import VerifyPending from "../pages/VerifyPending";
+import CustomerReviews from "../pages/CustomerReviews";
+import AdminReviewPanel from "../pages/AdminReviewPanel"; 
+
 
 
 const PrivateRoute = ({ element }) => {
@@ -80,30 +83,37 @@ const AppRoutes = () => {
       />
 
 
-<Route
-  path="/admin/dashboard"
-  element={
-    <ProtectedRoute><Dashboard /></ProtectedRoute>
-      
-  
-  }
-/>
-<Route path="/verify-pending" element={<VerifyPending />} />
-<Route
-  path="/admin/analytics"
-  element={
-   < ProtectedRoute>
-      <AdminAnalytics />
-    </ProtectedRoute>
-  }
-/>
+      <Route
+        path="/admin/dashboard"
+        element={
+          <ProtectedRoute><Dashboard /></ProtectedRoute>
+
+
+        }
+      />
+      <Route path="/verify-pending" element={<VerifyPending />} />
+      <Route
+        path="/admin/analytics"
+        element={
+          < ProtectedRoute>
+            <AdminAnalytics />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/admin/broadcast" element={<AdminBroadcast />} />
       <Route path="/admin/cards" element={<PrivateRoute element={<ManageCards />} />} />
 
       {/* ✅ New Routes for Password Reset */}
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+
+      <Route path="/events/:eventId/reviews" element={<CustomerReviews />} />
+      <Route
+        path="/admin/reviews"
+        element={<ProtectedRoute><AdminReviewPanel /></ProtectedRoute>} />
     </Routes>
+
+
 
   );
 };
