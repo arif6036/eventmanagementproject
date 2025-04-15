@@ -9,15 +9,18 @@
 }
 
 body {
-  padding-top: 80px;
+  padding-top: 0px;
   background-color: #102a24; 
   color: white; 
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+
+
 .container {
   max-width: 1200px;
   width: 100%;
+  height: 100%;
   padding-right: 15px;
   padding-left: 15px;
   margin-right: auto;
@@ -702,7 +705,7 @@ body {
   position: relative;
   background-color: #141b2d;
   color: #f8f9fa;
-  margin-top: 6rem;
+  margin-top: 0%;
 }
 
 /* Wave decoration at the top */

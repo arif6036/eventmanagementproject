@@ -2,6 +2,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button, Container, Row, Col } from "react-bootstrap";
+
 import { FaBullseye, FaRocket, FaRegLightbulb, FaPlusCircle, FaChevronRight, FaCalendarAlt } from "react-icons/fa";
 import "../styles/global.css";
 
@@ -29,7 +30,7 @@ const HomePage = () => {
 
   return (
     <div className="home-container text-light">
-      {/* Hero Section - Modern & Immersive */}
+     
       <motion.section
         className="hero-section position-relative d-flex flex-column justify-content-center w-100"
         initial={{ opacity: 0 }}
@@ -45,7 +46,7 @@ const HomePage = () => {
           width: "100%"
         }}
       >
-        <Container>
+        <Container >
           <Row className="align-items-center">
             <Col lg={7} className="mb-5 mb-lg-0">
               <motion.div variants={staggerContainer} initial="initial" animate="animate">
@@ -123,7 +124,7 @@ const HomePage = () => {
         </Container>
       </motion.section>
 
-      {/* About Section - Clean & Modern */}
+      
       <div className="about-section w-100" style={{ backgroundColor: "#0a1914" }}>
         <Container className="py-6" style={{ marginTop: "80px", marginBottom: "80px" }}>
           <Row className="justify-content-center mb-5">
@@ -146,7 +147,7 @@ const HomePage = () => {
         </Container>
       </div>
 
-      {/* Vision & Mission - Modern Cards */}
+      
       <div className="vision-mission-section w-100 py-6" style={{ background: "linear-gradient(180deg,rgb(20, 56, 44) 0%, #072E1F 100%)", width: "100%" }}>
         <Container>
           <Row className="g-4">

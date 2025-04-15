@@ -10,7 +10,7 @@ function App() {
   return (
     <>
       <NavigationBar />
-      <Container>
+      <Container fluid className="px-0">
         <AppRoutes /> 
         <NotificationListener />
         <ToastContainer position="top-right" autoClose={3000} />
