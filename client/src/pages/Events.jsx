@@ -1,10 +1,24 @@
 import { useEffect, useState } from "react";
 import { getAllEvents } from "../api/eventApi";
 import { getAllReviews } from "../api/reviewApi";
-import { Container, Row, Col, Card, Button, Spinner, Badge } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Spinner,
+  Badge
+} from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Calendar, MapPin, Clock, PlusCircle, Star } from "lucide-react";
+import {
+  Calendar,
+  MapPin,
+  Clock,
+  PlusCircle,
+  Star
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 
@@ -17,30 +31,25 @@ const Events = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAll = async () => {
       try {
-        const [eventsData, reviewsData] = await Promise.all([
+        setLoading(true);
+        const [eventData, reviewData] = await Promise.all([
           getAllEvents(),
           getAllReviews()
         ]);
-  
-        if (!Array.isArray(eventsData) || !Array.isArray(reviewsData)) {
-          throw new Error("Invalid API response");
-        }
-  
-        setEvents(eventsData);
-        setReviews(reviewsData.filter((r) => r.approved));
+        setEvents(eventData || []);
+        setReviews((reviewData || []).filter(r => r.approved));
       } catch (err) {
-        console.error("Error fetching events or reviews:", err);
-        setError("Failed to load events or reviews. Please try again later.");
+        console.error("Fetch Error:", err);
+        setError("Failed to load events or reviews.");
       } finally {
         setLoading(false);
       }
     };
-  
-    fetchData();
+
+    fetchAll();
   }, []);
-  
 
   const formatDate = (date) =>
     new Date(date).toLocaleDateString(undefined, {
@@ -75,12 +84,12 @@ const Events = () => {
           )}
         </motion.div>
 
-        {/* ✅ Reviews Block */}
+        {/* ✅ Approved Reviews */}
         {reviews.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
             className="mb-5"
           >
             <h4 className="text-light mb-3">⭐ Customer Reviews</h4>
@@ -104,7 +113,7 @@ const Events = () => {
           </motion.div>
         )}
 
-        {/* ✅ Event Cards */}
+        {/* ✅ Events List */}
         {loading ? (
           <div className="text-center py-5">
             <Spinner animation="border" variant="light" />
@@ -128,13 +137,14 @@ const Events = () => {
                 <motion.div
                   initial={{ opacity: 0, y: 40 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  transition={{ duration: 0.4, delay: index * 0.05 }}
                 >
                   <Card className="h-100 shadow border-0 bg-dark text-white rounded-4">
                     {event.image && (
                       <motion.img
                         src={event.image}
                         alt={event.title}
+                        loading="lazy"
                         style={{ height: "180px", objectFit: "cover" }}
                         className="card-img-top"
                         whileHover={{ scale: 1.03 }}

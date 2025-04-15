@@ -2,8 +2,8 @@
  * BASE STYLES
  * ----------------------------------------------------------- */
  html, body {
-  margin: 0;
-  padding: 0;
+  margin: 5 px;
+  padding: 5 px;
   overflow-x: hidden;
   width: 100%;
 }
@@ -29,6 +29,10 @@ body {
 
 /* Custom padding utility */
 .py-6 {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+.py-4 {
   padding-top: 4rem;
   padding-bottom: 4rem;
 }
@@ -705,7 +709,7 @@ body {
   position: relative;
   background-color: #141b2d;
   color: #f8f9fa;
-  margin-top:15px;
+  margin-top:20px;
 }
 
 /* Wave decoration at the top */

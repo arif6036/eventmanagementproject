@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { generateTicket, checkInTicket } from "../api/ticketApi";
 import { downloadTicketPDF } from "../utils/pdfGenerator";
-
 import {
   Container,
   Card,
@@ -13,7 +12,7 @@ import {
   Row,
   Col,
 } from "react-bootstrap";
-import { ArrowLeft, CheckCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle, Download } from "lucide-react";
 import { toast } from "react-toastify";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -82,24 +81,36 @@ const TicketQRCode = () => {
 
   if (loading) {
     return (
-      <Container className="d-flex justify-content-center align-items-center min-vh-100">
-        <Spinner animation="border" />
+      <Container className="d-flex justify-content-center align-items-center min-vh-100"padding="5">
+        <Spinner animation="border" variant="success" />
       </Container>
     );
   }
 
   return (
-    <Container className="py-4">
-      <div className="mb-3">
-        <Link to="/admin/tickets" className="btn btn-outline-secondary btn-sm">
-          <ArrowLeft size={18} className="me-1" /> Back to Tickets
-        </Link>
-      </div>
+    <Container className="py-5">
+      <Row className="mb-3 justify-content-between align-items-center">
+        <Col xs={12} md={6} className="mb-2 mb-md-0">
+          <Link to="/admin/tickets" className="btn btn-outline-secondary btn-sm">
+            <ArrowLeft size={18} className="me-1" /> Back to Tickets
+          </Link>
+        </Col>
+        <Col xs={12} md="auto" className="text-md-end text-center">
+          {ticket && (
+            <Button
+              variant="outline-success"
+              onClick={() => downloadTicketPDF(ticket, qrCode)}
+            >
+              <Download size={16} className="me-2" /> Download Ticket PDF
+            </Button>
+          )}
+        </Col>
+      </Row>
 
       {error && <Alert variant="danger">{error}</Alert>}
 
       {ticket ? (
-        <div ref={qrRef} className="p-3">
+        <div ref={qrRef} className="p-5">
           <Card className="shadow-lg border-0 rounded-4 ticket-card mx-auto">
             <Card.Header className="bg-success text-white text-center rounded-top-4 py-3">
               <h4 className="mb-0 fw-semibold">Event Ticket</h4>
@@ -149,21 +160,6 @@ const TicketQRCode = () => {
         </div>
       ) : (
         <Alert variant="warning">Ticket not found</Alert>
-      )}
-
-      {ticket && (
-        <div className="text-center">
-          {/* <Button onClick={handleDownload} variant="outline-primary" className="mt-3">
-            📥 Download Ticket as PDF
-          </Button> */}
-          <Button
-    variant="outline-success"
-    className="mt-3"
-    onClick={() => downloadTicketPDF(ticket, qrCode)}
-  >
-    📥 Download PDF Ticket
-  </Button>
-        </div>
       )}
     </Container>
   );
