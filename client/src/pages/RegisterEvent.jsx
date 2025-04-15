@@ -9,6 +9,7 @@ import { Upload, Calendar, Clock, MapPin, Tag, DollarSign, FileText, Image } fro
 const RegisterEvent = () => {
   const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
@@ -48,7 +49,6 @@ const RegisterEvent = () => {
       formData.append("time", time);
       formData.append("venue", venue);
       formData.append("eventType", eventType);
-
       if (eventType === "paid") {
         formData.append("ticketPrice", ticketPrice);
       }
@@ -75,8 +75,8 @@ const RegisterEvent = () => {
   };
 
   return (
-    <Container className="d-flex justify-content-center align-items-center vh-100">
-      <Card className="shadow-lg p-4" style={{ maxWidth: "600px", width: "100%" }}>
+    <Container className="py-5 d-flex justify-content-center align-items-center">
+      <Card className="shadow-lg w-100 p-4" style={{ maxWidth: "600px" }}>
         <Card.Body>
           <h2 className="text-center fw-bold mb-4">Create Event</h2>
           {error && <Alert variant="danger">{error}</Alert>}
@@ -92,14 +92,14 @@ const RegisterEvent = () => {
               <Form.Control as="textarea" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} required />
             </Form.Group>
 
-            <Row>
-              <Col>
+            <Row className="gx-2">
+              <Col xs={12} md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label><Calendar size={16} className="me-2" /> Date</Form.Label>
                   <Form.Control type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
                 </Form.Group>
               </Col>
-              <Col>
+              <Col xs={12} md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label><Clock size={16} className="me-2" /> Time</Form.Label>
                   <Form.Control type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
