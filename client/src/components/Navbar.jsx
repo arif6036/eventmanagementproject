@@ -175,7 +175,7 @@ const NavigationBar = () => {
                   as={Link}
                   to="/login"
                   onClick={closeMenu}
-                  className="animated-button primary-btn mt-2 mt-lg-0 ms-lg-3"
+                  className="animated-button success-btn mt-2 mt-lg-0 ms-lg-3"
                 >
                   <span className="button-text">Get Started</span>
                   <span className="button-shine"></span>

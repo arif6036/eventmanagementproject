@@ -203,7 +203,7 @@ body {
 }
 
 .fancy-nav-link.active {
-  color: #5271ff !important;
+  color: #07b36e !important;
   font-weight: 600;
 }
 
@@ -213,7 +213,7 @@ body {
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: #5271ff;
+  background-color: #02ad74;
   transform: scaleX(0);
   transform-origin: right;
   transition: transform 0.4s cubic-bezier(0.645, 0.045, 0.355, 1);
