@@ -16,7 +16,7 @@ router.post("/:eventId", protect, addReview);
 router.get("/:eventId", getReviews);
 
 // Admin-only routes
-router.get("/", protect, adminOnly, getAllReviews);
+router.get("/",getAllReviews);//public  remove protect, adminOnly, 
 router.put("/:id/approve", protect, adminOnly, approveReview);
 router.delete("/:id", protect, adminOnly, deleteReview);
 

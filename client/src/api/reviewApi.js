@@ -40,12 +40,33 @@ export const getAllReviews = async () => {
 
 // ✅ Approve a review (Admin)
 export const approveReview = async (reviewId) => {
-  const response = await axios.put(`${API_URL}/${reviewId}/approve`, {}, { withCredentials: true });
+  const token = localStorage.getItem("token");
+
+  const response = await axios.put(
+    `${API_URL}/${reviewId}/approve`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    }
+  );
+
   return response.data;
 };
 
+
 // ✅ Delete a review (Admin)
 export const deleteReview = async (reviewId) => {
-  const response = await axios.delete(`${API_URL}/${reviewId}`, { withCredentials: true });
+  const token = localStorage.getItem("token");
+
+  const response = await axios.delete(`${API_URL}/${reviewId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    withCredentials: true,
+  });
+
   return response.data;
 };

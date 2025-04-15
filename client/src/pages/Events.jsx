@@ -1,44 +1,61 @@
 import { useEffect, useState } from "react";
 import { getAllEvents } from "../api/eventApi";
+import { getAllReviews } from "../api/reviewApi";
 import { Container, Row, Col, Card, Button, Spinner, Badge } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Calendar, MapPin, Clock, PlusCircle } from "lucide-react";
+import { Calendar, MapPin, Clock, PlusCircle, Star } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 
 const Events = () => {
   const [events, setEvents] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
   useEffect(() => {
-    setLoading(true);
-    getAllEvents()
-      .then(data => {
-        setEvents(data);
+    const fetchData = async () => {
+      try {
+        const [eventsData, reviewsData] = await Promise.all([
+          getAllEvents(),
+          getAllReviews()
+        ]);
+  
+        if (!Array.isArray(eventsData) || !Array.isArray(reviewsData)) {
+          throw new Error("Invalid API response");
+        }
+  
+        setEvents(eventsData);
+        setReviews(reviewsData.filter((r) => r.approved));
+      } catch (err) {
+        console.error("Error fetching events or reviews:", err);
+        setError("Failed to load events or reviews. Please try again later.");
+      } finally {
         setLoading(false);
-      })
-      .catch(error => {
-        console.error("Error fetching events:", error);
-        setError("Failed to load events. Please try again later.");
-        setLoading(false);
-      });
+      }
+    };
+  
+    fetchData();
   }, []);
+  
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString(undefined, {
-      weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
+  const formatDate = (date) =>
+    new Date(date).toLocaleDateString(undefined, {
+      weekday: "short", year: "numeric", month: "short", day: "numeric"
     });
-  };
 
-  const getTime = (dateString) => {
-    return new Date(dateString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
+  const getTime = (date) =>
+    new Date(date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-  const handleCreateEvent = () => {
-    navigate("/create-event");
+  const handleRegisterEvent = () => {
+    if (user?.role === "admin") {
+      navigate("/registerevent");
+    } else {
+      toast.error("Only admins can register events!");
+    }
   };
 
   return (
@@ -52,12 +69,42 @@ const Events = () => {
         >
           <h2 className="fw-bold text-success">🌟 Upcoming Events</h2>
           {user?.role === "admin" && (
-            <Button variant="outline-light" onClick={handleCreateEvent}>
+            <Button variant="outline-light" onClick={handleRegisterEvent}>
               <PlusCircle size={18} className="me-2" /> Add Event
             </Button>
           )}
         </motion.div>
 
+        {/* ✅ Reviews Block */}
+        {reviews.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="mb-5"
+          >
+            <h4 className="text-light mb-3">⭐ Customer Reviews</h4>
+            <Row className="g-3">
+              {reviews.slice(0, 4).map((review) => (
+                <Col key={review._id} md={6} lg={3}>
+                  <Card className="bg-dark text-light shadow-sm h-100">
+                    <Card.Body>
+                      <div className="d-flex align-items-center mb-2">
+                        <Star className="text-warning me-2" />
+                        <strong>{review.user?.name || "Anonymous"}</strong>
+                      </div>
+                      <p className="mb-1 small"><strong>Event:</strong> {review.event?.title || "N/A"}</p>
+                      <p className="mb-1">⭐ {review.rating} / 5</p>
+                      <p className="text-muted small mb-0">{review.comment}</p>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          </motion.div>
+        )}
+
+        {/* ✅ Event Cards */}
         {loading ? (
           <div className="text-center py-5">
             <Spinner animation="border" variant="light" />
@@ -69,7 +116,7 @@ const Events = () => {
           <div className="text-center py-5 text-muted">
             <p>No upcoming events found.</p>
             {user?.role === "admin" && (
-              <Button variant="outline-success" onClick={handleCreateEvent}>
+              <Button variant="outline-success" onClick={handleRegisterEvent}>
                 Create an Event
               </Button>
             )}
