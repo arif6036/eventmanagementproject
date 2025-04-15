@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getUserTickets } from "../api/ticketApi";
-import { Container, Table, Alert, Spinner, Button } from "react-bootstrap";
+import { Container, Table, Alert, Spinner, Button, Row, Col } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -12,7 +12,6 @@ const MyTickets = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // ✅ Ensure user is logged in
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/login"); // Redirect to login if no token
@@ -33,57 +32,64 @@ const MyTickets = () => {
   if (loading) {
     return (
       <Container className="d-flex justify-content-center align-items-center min-vh-100">
-        <Spinner animation="border" />
+        <Spinner animation="border" variant="success" />
       </Container>
     );
   }
 
   return (
-    <Container className="mt-4">
-      <h2 className="mb-4">My Tickets</h2>
+    <Container fluid className="px-3 py-5">
+      <Row className="justify-content-center">
+        <Col xs={12} lg={10}>
+          <h2 className="mb-4 text-center fw-bold">🎟️ My Tickets</h2>
 
-      {error && <Alert variant="danger">{error}</Alert>}
+          {error && <Alert variant="danger">{error}</Alert>}
 
-      {tickets.length === 0 ? (
-        <Alert variant="info">No tickets booked yet.</Alert>
-      ) : (
-        <Table striped bordered hover responsive>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Event</th>
-              <th>Date</th>
-              <th>Ticket Type</th>
-              <th>Price</th>
-              <th>Actions</th> {/* New column */}
-            </tr>
-          </thead>
-          <tbody>
-            {tickets.map((ticket, index) => (
-              <tr key={ticket._id}>
-                <td>{index + 1}</td>
-                <td>{ticket.event ? ticket.event.title : "Unknown Event"}</td>
-                <td>
-                  {ticket.event
-                    ? new Date(ticket.event.date).toDateString()
-                    : "No Date"}
-                </td>
-                <td>{ticket.ticketType || "Standard"}</td>
-                <td>${ticket.price.toFixed(2)}</td>
-                <td>
-                  <Button
-                    variant="success"
-                    size="sm"
-                    onClick={() => navigate(`/ticket/${ticket._id}/qrcode`)}
-                  >
-                    View QR Code
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      )}
+          {tickets.length === 0 ? (
+            <Alert variant="info" className="text-center">No tickets booked yet.</Alert>
+          ) : (
+            <div className="table-responsive shadow rounded">
+              <Table striped bordered hover responsive className="mb-0">
+                <thead className="table-dark">
+                  <tr>
+                    <th>#</th>
+                    <th>Event</th>
+                    <th>Date</th>
+                    <th>Ticket Type</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tickets.map((ticket, index) => (
+                    <tr key={ticket._id}>
+                      <td>{index + 1}</td>
+                      <td>{ticket.event ? ticket.event.title : "Unknown Event"}</td>
+                      <td>
+                        {ticket.event
+                          ? new Date(ticket.event.date).toLocaleDateString()
+                          : "No Date"}
+                      </td>
+                      <td>{ticket.ticketType || "Standard"}</td>
+                      <td>${ticket.price?.toFixed(2)}</td>
+                      <td>
+                        <Button
+                          variant="success"
+                          size="sm"
+                          className="w-100"
+                          onClick={() => navigate(`/ticket/${ticket._id}/qrcode`)}
+                        >
+                          View QR
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </div>
+          )}
+        </Col>
+      </Row>
     </Container>
   );
 };

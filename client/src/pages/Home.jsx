@@ -240,56 +240,63 @@ const HomePage = () => {
             <p className="lead text-light opacity-75 mx-auto" style={{ maxWidth: "700px" }}>
               Discover how our platform has helped event organizers create meaningful experiences and build stronger communities.
             </p>
+
+            
           </motion.div>
 
           <Row className="g-4">
-            {[
-              {
-                title: "Tech Summit 2024",
-                description: "Connected over 5,000 tech enthusiasts across 3 days with seamless registration, digital check-ins, and interactive sessions.",
-                attendees: "5,000+"
-              },
-              {
-                title: "Cultural Fest Gala",
-                description: "Managed 20+ events across multiple venues with real-time updates, QR ticketing, and personalized attendee journeys.",
-                attendees: "12,000+"
-              },
-              {
-                title: "Startup Weekend",
-                description: "Facilitated 100+ pitches, mentor connections, and networking opportunities for emerging entrepreneurs and investors.",
-                attendees: "1,200+"
-              }
-            ].map((story, index) => (
-              <Col lg={4} md={6} key={index}>
-                <motion.div
-                  className="h-100 rounded-4 overflow-hidden position-relative"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.2 }}
-                >
-                  <div 
-                    className="p-5 h-100 d-flex flex-column"
-                    style={{ 
-                      background: "linear-gradient(135deg, rgba(10, 40, 30, 0.7) 0%, rgba(5, 25, 18, 0.9) 100%)",
-                      border: "1px solid rgba(255, 255, 255, 0.08)",
-                    }}
-                  >
-                    <div className="d-inline-block p-3 rounded mb-4" style={{ background: "rgba(5, 122, 81, 0.2)" }}>
-                      <FaRegLightbulb size={22} className="text-warning" /> {story.title}
-                    </div>
-                    
-                    <p className="text-light opacity-75 mb-4">{story.description}</p>
-                    <div className="mt-auto">
-                      <span className="badge bg-success bg-opacity-25 text-success px-3 py-2">
-                        {story.attendees} Attendees
-                      </span>
-                    </div>
-                  </div>
-                </motion.div>
-              </Col>
-            ))}
-          </Row>
+  {[
+    {
+      title: "Tech Summit 2024",
+      description: "Connected over 5,000 tech enthusiasts across 3 days with seamless registration, digital check-ins, and interactive sessions.",
+      attendees: "5,000+"
+    },
+    {
+      title: "Cultural Fest Gala",
+      description: "Managed 20+ events across multiple venues with real-time updates, QR ticketing, and personalized attendee journeys.",
+      attendees: "12,000+"
+    },
+    {
+      title: "Startup Weekend",
+      description: "Facilitated 100+ pitches, mentor connections, and networking opportunities for emerging entrepreneurs and investors.",
+      attendees: "1,200+"
+    }
+  ].map((story, index) => (
+    <Col lg={4} md={6} key={index}>
+      <motion.div
+        className="h-100 rounded-4 overflow-hidden position-relative"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        whileHover={{ rotateY: 360 }}
+        transition={{ duration: 0.8, ease: "easeInOut" }}
+        viewport={{ once: true }}
+        style={{
+          transformStyle: "preserve-3d"
+        }}
+      >
+        <div
+          className="p-5 h-100 d-flex flex-column"
+          style={{
+            background: "linear-gradient(135deg, rgba(10, 40, 30, 0.7) 0%, rgba(5, 25, 18, 0.9) 100%)",
+            border: "1px solid rgba(255, 255, 255, 0.08)"
+          }}
+        >
+          <div className="d-inline-block p-3 rounded mb-4" style={{ background: "rgba(5, 122, 81, 0.2)" }}>
+            <FaRegLightbulb size={22} className="text-warning" /> {story.title}
+          </div>
+
+          <p className="text-light opacity-75 mb-4">{story.description}</p>
+          <div className="mt-auto">
+            <span className="badge bg-success bg-opacity-25 text-success px-3 py-2">
+              {story.attendees} Attendees
+            </span>
+          </div>
+        </div>
+      </motion.div>
+    </Col>
+  ))}
+</Row>
+
 
           <div className="text-center mt-5">
             <motion.div
