@@ -24,6 +24,7 @@ import AdminAnalytics from "../pages/AdminAnalytics";
 import VerifyPending from "../pages/VerifyPending";
 import CustomerReviews from "../pages/CustomerReviews";
 import AdminReviewPanel from "../pages/AdminReviewPanel"; 
+import AdminRegiteruser from "../pages/AdminRegisteruser";
 
 
 
@@ -82,7 +83,12 @@ const AppRoutes = () => {
         }
       />
 
+<Route 
+path="/admin/register-user" 
+element={<AdminRegiteruser />} />
 
+       
+        
       <Route
         path="/admin/dashboard"
         element={
