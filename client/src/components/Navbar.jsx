@@ -1,9 +1,10 @@
-import { Navbar, Nav, Container, Button, Offcanvas } from "react-bootstrap";
+import { Navbar, Nav, Container, Button } from "react-bootstrap";
 import { Link, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../features/authSlice";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback, memo } from "react";
+import "../styles/global.css";
 
 const NavigationBar = () => {
   const { user } = useSelector((state) => state.auth);
@@ -15,44 +16,67 @@ const NavigationBar = () => {
   const [expanded, setExpanded] = useState(false);
   const [isScrollingUp, setIsScrollingUp] = useState(true);
   const lastScrollPosition = useRef(0);
+  const [activeDropdown, setActiveDropdown] = useState(null);
   const [navProgress, setNavProgress] = useState(0);
+  const dropdownRef = useRef(null);
+
+  // Memoize scroll handler for better performance
+  const handleScroll = useCallback(() => {
+    const currentScrollPosition = window.scrollY;
+    const windowHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = windowHeight > 0 ? (currentScrollPosition / windowHeight) * 100 : 0;
+    
+    setNavProgress(progress);
+    setScrollPosition(currentScrollPosition);
+    
+    // Detect scroll direction
+    if (currentScrollPosition < lastScrollPosition.current) {
+      setIsScrollingUp(true);
+    } else if (currentScrollPosition > 50) {
+      setIsScrollingUp(false);
+    }
+    
+    lastScrollPosition.current = currentScrollPosition;
+  }, []);
+
+  // Handle clicks outside of dropdown
+  const handleClickOutside = useCallback((event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setActiveDropdown(null);
+    }
+  }, []);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollPosition = window.scrollY;
-      const windowHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = (currentScrollPosition / windowHeight) * 100;
-      
-      setNavProgress(progress);
-      setScrollPosition(currentScrollPosition);
-      
-      // Detect scroll direction with better UX
-      if (currentScrollPosition < lastScrollPosition.current) {
-        setIsScrollingUp(true);
-      } else if (currentScrollPosition > lastScrollPosition.current && currentScrollPosition > 80) {
-        setIsScrollingUp(false);
-      }
-      
-      lastScrollPosition.current = currentScrollPosition;
-    };
-
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    document.addEventListener("mousedown", handleClickOutside);
     
-    // Loading animation
-    setTimeout(() => setIsLoaded(true), 100);
+    // Enhanced loading animation
+    const loadTimer = setTimeout(() => setIsLoaded(true), 100);
     
-    // Animate navbar items
+    // Animate navbar items sequentially
     const navItems = document.querySelectorAll('.nav-item-wrapper');
+    const animationTimers = [];
+    
     navItems.forEach((item, index) => {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         item.classList.add('nav-item-animated');
       }, 100 * (index + 1));
+      animationTimers.push(timer);
     });
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("mousedown", handleClickOutside);
+      clearTimeout(loadTimer);
+      animationTimers.forEach(timer => clearTimeout(timer));
     };
-  }, []);
+  }, [handleScroll, handleClickOutside]);
+
+  // Close dropdown when route changes
+  useEffect(() => {
+    setActiveDropdown(null);
+    setExpanded(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -61,41 +85,69 @@ const NavigationBar = () => {
 
   const closeMenu = () => setExpanded(false);
 
-  const renderNavLink = (to, label, options = {}) => {
-    const { badge, dropdown } = options;
+  const toggleDropdown = (dropdownId, event) => {
+    event.preventDefault();
+    setActiveDropdown(activeDropdown === dropdownId ? null : dropdownId);
+  };
+
+  const renderNavLink = useCallback((to, label, options = {}) => {
+    const { badge, dropdown, animation = true } = options;
+    const isActive = location.pathname === to || 
+                    (dropdown && dropdown.some(item => location.pathname === item.link));
+    
     return (
-      <div className="nav-item-wrapper">
-        <Nav.Link
-          as={Link}
-          to={to}
-          onClick={closeMenu}
-          className={`fancy-nav-link ${location.pathname === to ? "active" : ""}`}
-        >
-          <span className="link-text">
-            {label}
-            {badge && <span className="nav-badge">{badge}</span>}
-          </span>
-          <span className="link-underline"></span>
-          <span className="link-background"></span>
-        </Nav.Link>
-        {dropdown && (
-          <div className="dropdown-menu-custom">
-            {dropdown.map((item, index) => (
-              <Link 
-                key={index} 
-                to={item.link} 
-                className="dropdown-item-custom"
-                onClick={closeMenu}
-              >
-                <span className="dropdown-icon">{item.icon}</span>
-                <span className="dropdown-text">{item.label}</span>
-              </Link>
-            ))}
+      <div className={`nav-item-wrapper ${dropdown ? 'has-dropdown' : ''}`} ref={dropdown ? dropdownRef : null}>
+        {dropdown ? (
+          <div className="dropdown-container">
+            <Nav.Link
+              onClick={(e) => toggleDropdown(to, e)}
+              className={`fancy-nav-link ${isActive ? "active" : ""} ${
+                animation ? 'animate' : ''
+              }`}
+            >
+              <span className="link-text">
+                {label}
+                {badge && <span className="nav-badge">{badge}</span>}
+                <span className="dropdown-indicator">{activeDropdown === to ? '▲' : '▼'}</span>
+              </span>
+              <span className="hover-effect"></span>
+            </Nav.Link>
+            
+            {activeDropdown === to && (
+              <div className="dropdown-menu-custom">
+                {dropdown.map((item, index) => (
+                  <Link 
+                    key={index} 
+                    to={item.link} 
+                    className={`dropdown-item-custom ${location.pathname === item.link ? 'active' : ''}`}
+                    onClick={closeMenu}
+                  >
+                    {item.icon && <span className="dropdown-icon">{item.icon}</span>}
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
+        ) : (
+          <Nav.Link
+            as={Link}
+            to={to}
+            onClick={closeMenu}
+            className={`fancy-nav-link ${isActive ? "active" : ""} ${
+              animation ? 'animate' : ''
+            }`}
+          >
+            <span className="link-text">
+              {label}
+              {badge && <span className="nav-badge">{badge}</span>}
+            </span>
+            <span className="hover-effect"></span>
+          </Nav.Link>
         )}
       </div>
     );
-  };
+  }, [location.pathname, activeDropdown, closeMenu]);
 
   return (
     <>
@@ -111,122 +163,111 @@ const NavigationBar = () => {
         bg="dark"
         variant="dark"
       >
-        <Container>
-          <div className="navbar-content">
-            <Navbar.Brand as={Link} to="/" className="brand-logo">
-              <div className="brand-container">
-                <span className="brand-icon-wrapper">
-                  <svg className="brand-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </span>
-                <span className="brand-text">Event</span>
-                <span className="brand-accent">Ease</span>
-                <span className="brand-dot">.</span>
-              </div>
-            </Navbar.Brand>
-
-            <Navbar.Toggle
-              aria-controls="navbar-nav"
-              onClick={() => setExpanded(!expanded)}
-              className={`custom-toggler ${expanded ? "active" : ""}`}
-            >
-              <span className="toggler-icon-wrapper">
-                <span className="toggler-icon"></span>
-                <span className="toggler-icon"></span>
-                <span className="toggler-icon"></span>
+        <Container fluid="lg" className="px-3 px-lg-4">
+          <Navbar.Brand as={Link} to="/" className="brand-logo">
+            <div className="brand-container">
+              <span className="brand-icon-wrapper">
+                <svg className="brand-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </span>
-            </Navbar.Toggle>
+              <span className="brand-text">Event</span>
+              <span className="brand-accent">Ease</span>
+              <span className="brand-dot">.</span>
+            </div>
+          </Navbar.Brand>
 
-            <Navbar.Collapse id="navbar-nav">
-              <Nav className="ms-auto nav-links-container">
-                {renderNavLink("/", "Home")}
-                {renderNavLink("/events", "Events", {
-                  badge: "New",
-                  dropdown: [
-                    { label: "Upcoming Events", link: "/events/upcoming", icon: "📅" },
-                    { label: "Past Events", link: "/events/past", icon: "🕒" },
-                    { label: "Popular Events", link: "/events/popular", icon: "⭐" }
-                  ]
-                })}
+          <Navbar.Toggle
+            aria-controls="navbar-nav"
+            onClick={() => setExpanded(!expanded)}
+            className={`custom-toggler ${isLoaded ? "loaded" : ""} ${expanded ? "active" : ""}`}
+          >
+            <span className="toggler-icon-wrapper">
+              <span className="toggler-icon"></span>
+              <span className="toggler-icon"></span>
+              <span className="toggler-icon"></span>
+            </span>
+          </Navbar.Toggle>
 
-                {user ? (
-                  <>
-                    {renderNavLink("/my-tickets", "My Tickets")}
-                    
-                    {user.role === "admin" && (
-                      <>
-                        {renderNavLink("/dashboard", "Admin Panel", {
-                          dropdown: [
-                            { label: "Analytics", link: "/dashboard/analytics", icon: "📊" },
-                            { label: "User Management", link: "/dashboard/users", icon: "👥" },
-                            { label: "Settings", link: "/dashboard/settings", icon: "⚙️" }
-                          ]
-                        })}
-                        {renderNavLink("/registerevent", "Register Event")}
-                      </>
-                    )}
+          <Navbar.Collapse id="navbar-nav">
+            <Nav className="ms-auto nav-links-container align-items-lg-center">
+              {renderNavLink("/", "Home")}
+              {renderNavLink("/events", "Events controls", {
+                badge: "New",
+              })}
 
-                    <div className="nav-item-wrapper user-section">
-                      <div className="user-profile">
-                        <div className="user-avatar">
-                          {user.name ? user.name.charAt(0).toUpperCase() : "U"}
-                        </div>
-                        <span className="user-name">{user.name || "User"}</span>
-                        <div className="user-dropdown-icon">▼</div>
+              {user ? (
+                <>
+                  {renderNavLink("/my-tickets", "My Tickets")}
+                  
+                  {user.role === "admin" && (
+                    <>
+                      {renderNavLink("/dashboard", "Admin Activity", {
+                        dropdown: [
+                          { label: "Admin Panel", link: "/dashboard", icon: "🗂️" },
+                          { label: "Analytics", link: "/admin/analytics", icon: "📊" },
+                          { label: "User Management", link: "/admin/users" , icon: "👥" },
+                          { label: "Settings", link: "/settings", icon: "⚙️" }
+                        ]
+                      })}
+                      {renderNavLink("/registerevent", "Register Event")}
+                    </>
+                  )}
+
+                  <div className="nav-item-wrapper profile-section d-flex align-items-center">
+                    <div className="user-profile">
+                      <div className="user-avatar">
+                        {user.name ? user.name.charAt(0).toUpperCase() : "U"}
                       </div>
-                      <div className="user-dropdown-menu">
-                        <Link to="/profile" className="user-dropdown-item" onClick={closeMenu}>
-                          <span className="dropdown-icon">👤</span>
-                          Profile
-                        </Link>
-                        <Link to="/settings" className="user-dropdown-item" onClick={closeMenu}>
-                          <span className="dropdown-icon">⚙️</span>
-                          Settings
-                        </Link>
-                        <button 
-                          className="user-dropdown-item logout-item" 
-                          onClick={() => {
-                            handleLogout();
-                            closeMenu();
-                          }}
-                        >
-                          <span className="dropdown-icon">🚪</span>
-                          Logout
-                        </button>
-                      </div>
+                      <span className="user-name d-none d-lg-inline">{user.name || "User"}</span>
                     </div>
-                  </>
-                ) : (
-                  <>
+                    
+                    <Button
+                      variant="outline"
+                      className="animated-button logout-btn ms-3"
+                      onClick={handleLogout}
+                    >
+                      <span className="button-text d-none d-sm-inline">Logout</span>
+                      <span className="button-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </span>
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <div className="d-flex flex-column flex-lg-row align-items-lg-center mt-3 mt-lg-0">
+                  <div className="d-flex auth-links mb-3 mb-lg-0">
                     {renderNavLink("/login", "Login")}
                     {renderNavLink("/register", "Register")}
-                    
-                    <div className="nav-item-wrapper">
-                      <Button
-                        as={Link}
-                        to="/login"
-                        onClick={closeMenu}
-                        className="cta-button get-started-btn"
-                      >
-                        <span className="button-content">
-                          <span className="button-text">Get Started</span>
-                          <span className="button-arrow">→</span>
-                        </span>
-                        <span className="button-bg"></span>
-                      </Button>
-                    </div>
-                  </>
-                )}
-              </Nav>
-            </Navbar.Collapse>
-          </div>
+                  </div>
+                  
+                  <Button
+                    as={Link}
+                    to="/login"
+                    onClick={closeMenu}
+                    className="animated-button cta-button ms-lg-3"
+                  >
+                    <span className="button-content">
+                      <span className="button-text">Get Started</span>
+                      <span className="button-icon">→</span>
+                    </span>
+                    <span className="button-glow"></span>
+                  </Button>
+                </div>
+              )}
+            </Nav>
+          </Navbar.Collapse>
         </Container>
       </Navbar>
     </>
   );
 };
 
-export default NavigationBar;
+// Memoize the entire component to prevent unnecessary re-renders
+export default memo(NavigationBar);

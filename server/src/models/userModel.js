@@ -24,6 +24,11 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false, // 👈 added for email verification
     },
+    darkMode: {
+      type: Boolean,
+      default: false,
+    }
+    
   },
   { timestamps: true }
 );

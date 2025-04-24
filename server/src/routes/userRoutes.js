@@ -10,7 +10,9 @@ const {
     resetPassword,
     getAllUsers,
     deleteUser,
-    deleteAllUsers
+    deleteAllUsers,
+    deleteAccount
+  
 } = require("../controllers/userController");
 
 const { protect, adminOnly } = require("../middleware/authMiddleware");
@@ -39,5 +41,7 @@ router.get("/admin/dashboard", protect, adminOnly, (req, res) => {
 router.get("/all-users", protect, adminOnly, getAllUsers);
 router.delete("/delete-user/:id", protect, adminOnly, deleteUser);
 router.delete("/delete-all", protect, adminOnly, deleteAllUsers);
+router.delete("/delete-account", protect,adminOnly, deleteAccount); // ✅ Added delete account route
+  
 
 module.exports = router;

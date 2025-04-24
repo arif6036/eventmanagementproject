@@ -107,3 +107,61 @@ export const resetPassword = async (token, newPassword) => {
 //   const response = await axios.post(`${API_URL}/reset-password/${token}`, { newPassword });
 //   return response.data;
 // };
+
+
+// ✅ Update Profile
+export const updateProfileAPI = async (data, token) => {
+  try {
+    const res = await axios.put(`${API_URL}/update-profile`, {
+      name: data.name,
+      email: data.email,
+    }, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Update Profile Error:", error.response?.data || error.message);
+    throw error.response?.data || error;
+  }
+};
+
+
+
+// ✅ Change Password
+export const changePasswordAPI = async (data, token) => {
+  try {
+    const response = await axios.put( // ✅ Use PUT not POST for change-password
+      `${API_URL}/change-password`,
+      {
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Change Password Error:", error.response?.data || error.message);
+    throw error.response?.data || error;
+  }
+};
+
+
+
+// ✅ Delete Account
+export const deleteAccountAPI = async (token) => {
+  const res = await axios.delete(`${BASE_URL}delete`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return res.data;
+};
+

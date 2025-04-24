@@ -25,6 +25,7 @@ import VerifyPending from "../pages/VerifyPending";
 import CustomerReviews from "../pages/CustomerReviews";
 import AdminReviewPanel from "../pages/AdminReviewPanel"; 
 import AdminRegiteruser from "../pages/AdminRegisteruser";
+import Settings from "../pages/Settings";
 
 
 
@@ -38,6 +39,8 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/events" element={<Events />} />
+      <Route path="/settings" element={<Settings />} />
+
 
       <Route path="/events/:id" element={<EventDetails />} />
       <Route path="/login" element={<Login />} />

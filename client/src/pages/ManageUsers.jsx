@@ -147,10 +147,10 @@ const ManageUsers = () => {
     });
 
   return (
-    <motion.div style={{ backgroundColor: "#1c4f3d", color: "#fff", minHeight: "100vh" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }}>
+    <motion.div style={{ backgroundColor: "#1c4f3d", color: "white", minHeight: "100vh" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }}>
       <Container className="py-5">
-        <h2 className="text-center mb-4 text-success">
-          <Shield className="me-2" /> Manage Users
+        <h2 className="text-center mb-4 " color=" white">
+          <Shield className="me-2" color="white" /> Manage Users
         </h2>
 
         <Row className="align-items-center mb-3 g-2">

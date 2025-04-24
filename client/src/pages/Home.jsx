@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 const HomePage = () => {
   const [scrollY, setScrollY] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
   const heroRef = useRef(null);
 
   // Handle scroll position
@@ -25,10 +26,21 @@ const HomePage = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Parallax calculation
   const parallaxY = scrollY * 0.3;
   const parallaxOpacity = Math.max(0, 1 - scrollY / 500);
   const parallaxScale = 1 + scrollY / 3000;
+
+  // Check if mobile view
+  const isMobile = windowWidth < 768;
+  const isTablet = windowWidth >= 768 && windowWidth < 1024;
 
   // Custom icons
   const CalendarIcon = () => (
@@ -107,14 +119,15 @@ const HomePage = () => {
     content: {
       maxWidth: '1200px',
       margin: '0 auto',
-      padding: '0 20px',
+      padding: isMobile ? '0 16px' : '0 20px',
       position: 'relative',
-      zIndex: 2
+      zIndex: 2,
+      width: '100%'
     },
     mainTitle: {
-      fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+      fontSize: isMobile ? 'clamp(2rem, 5vw, 2.5rem)' : 'clamp(2.5rem, 5vw, 4rem)',
       fontWeight: 'bold',
-      marginBottom: '1.5rem',
+      marginBottom: isMobile ? '1rem' : '1.5rem',
       background: 'linear-gradient(90deg, #ffffff, #a8ffda)',
       WebkitBackgroundClip: 'text',
       WebkitTextFillColor: 'transparent',
@@ -122,9 +135,9 @@ const HomePage = () => {
       animation: 'gradientText 5s linear infinite'
     },
     subtitle: {
-      fontSize: '1.25rem',
+      fontSize: isMobile ? '1rem' : '1.25rem',
       opacity: 0.75,
-      marginBottom: '2rem',
+      marginBottom: isMobile ? '1.5rem' : '2rem',
       maxWidth: '600px'
     },
     buttonsContainer: {
@@ -133,11 +146,11 @@ const HomePage = () => {
       flexWrap: 'wrap'
     },
     button: {
-      padding: '1rem 2rem',
+      padding: isMobile ? '0.75rem 1.5rem' : '1rem 2rem',
       borderRadius: '8px',
       border: 'none',
       cursor: 'pointer',
-      fontSize: '1rem',
+      fontSize: isMobile ? '0.875rem' : '1rem',
       fontWeight: '500',
       display: 'flex',
       alignItems: 'center',
@@ -155,24 +168,24 @@ const HomePage = () => {
       border: '2px solid white'
     },
     section: {
-      padding: '5rem 0',
+      padding: isMobile ? '3rem 0' : '5rem 0',
       position: 'relative'
     },
     sectionTitle: {
-      fontSize: '2.5rem',
+      fontSize: isMobile ? '1.75rem' : '2.5rem',
       fontWeight: 'bold',
       textAlign: 'center',
       marginBottom: '1rem'
     },
     sectionSubtitle: {
-      fontSize: '1.25rem',
+      fontSize: isMobile ? '1rem' : '1.25rem',
       textAlign: 'center',
       opacity: 0.75,
       maxWidth: '700px',
       margin: '0 auto 3rem'
     },
     card: {
-      padding: '2rem',
+      padding: isMobile ? '1.5rem' : '2rem',
       borderRadius: '1rem',
       background: 'linear-gradient(135deg, rgba(0, 80, 53, 0.2) 0%, rgba(0, 40, 26, 0.6) 100%)',
       border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -180,8 +193,8 @@ const HomePage = () => {
       transition: 'transform 0.3s ease, box-shadow 0.3s ease'
     },
     cardIcon: {
-      width: '60px',
-      height: '60px',
+      width: isMobile ? '50px' : '60px',
+      height: isMobile ? '50px' : '60px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -191,20 +204,35 @@ const HomePage = () => {
     },
     grid: {
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-      gap: '2rem',
-      padding: '0 20px',
+      gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(300px, 1fr))',
+      gap: isMobile ? '1.5rem' : '2rem',
+      padding: isMobile ? '0 16px' : '0 20px',
       maxWidth: '1200px',
       margin: '0 auto'
     },
     badge: {
       display: 'inline-block',
-      padding: '0.5rem 1rem',
+      padding: isMobile ? '0.35rem 0.75rem' : '0.5rem 1rem',
       borderRadius: '20px',
       background: 'rgba(0, 168, 112, 0.2)',
       color: '#00A870',
-      fontSize: '0.875rem',
+      fontSize: isMobile ? '0.75rem' : '0.875rem',
       fontWeight: '500'
+    },
+    heroGrid: {
+      display: 'grid',
+      gridTemplateColumns: isMobile ? '1fr' : isTablet ? '1.5fr 1fr' : '2fr 1fr',
+      gap: isMobile ? '2rem' : isTablet ? '3rem' : '4rem',
+      alignItems: 'center'
+    },
+    eventCard: {
+      padding: isMobile ? '1.5rem' : '2rem',
+      borderRadius: '1rem',
+      background: 'rgba(0, 0, 0, 0.5)',
+      backdropFilter: 'blur(10px)',
+      border: '1px solid rgba(255, 255, 255, 0.1)',
+      transform: !isMobile ? `translate(${mousePosition.x * 0.02}px, ${mousePosition.y * 0.02}px)` : 'none',
+      transition: 'transform 0.1s ease-out'
     }
   };
 
@@ -230,7 +258,7 @@ const HomePage = () => {
         </div>
         
         <div style={styles.content}>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '4rem', alignItems: 'center' }}>
+          <div style={styles.heroGrid}>
             <div style={{ maxWidth: '600px' }}>
               <span style={{...styles.badge, marginBottom: '1rem', display: 'inline-block'}}>
                 Discover Amazing Events
@@ -246,50 +274,46 @@ const HomePage = () => {
                   style={{...styles.button, ...styles.primaryButton}}
                   onMouseEnter={(e) => e.target.style.transform = 'translateY(-5px)'}
                   onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+                  onClick={() => window.location.href = '/events'}
                 >
                   Explore Events <ChevronRightIcon />
                 </button>
               </div>
             </div>
             
-            <div style={{
-              padding: '2rem',
-              borderRadius: '1rem',
-              background: 'rgba(0, 0, 0, 0.5)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              transform: `translate(${mousePosition.x * 0.02}px, ${mousePosition.y * 0.02}px)`,
-              transition: 'transform 0.1s ease-out'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <div style={{
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: '50%',
-                  background: '#00A870',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginRight: '1rem'
-                }}>
-                  <CalendarIcon />
+            {/* Hide card on very small screens */}
+            {windowWidth > 640 && (
+              <div style={styles.eventCard}>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1.5rem' }}>
+                  <div style={{
+                    width: isMobile ? '40px' : '50px',
+                    height: isMobile ? '40px' : '50px',
+                    borderRadius: '50%',
+                    background: '#00A870',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: '1rem'
+                  }}>
+                    <CalendarIcon />
+                  </div>
+                  <div>
+                    <h5 style={{ margin: 0, fontSize: isMobile ? '1rem' : '1.125rem' }}>Upcoming Featured Event</h5>
+                    <p style={{ margin: 0, color: '#00A870' }}>Next Week</p>
+                  </div>
                 </div>
-                <div>
-                  <h5 style={{ margin: 0, fontSize: '1.125rem' }}>Upcoming Featured Event</h5>
-                  <p style={{ margin: 0, color: '#00A870' }}>Next Week</p>
+                <h4 style={{ fontSize: isMobile ? '1.25rem' : '1.5rem', marginBottom: '1rem' }}>EventEase</h4>
+                <p style={{ opacity: 0.75, marginBottom: '1.5rem' }}>
+                  Join industry leaders for a three-day immersive experience covering AI, blockchain, and sustainable tech.
+                </p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={styles.badge}>650+ Attending</span>
+                  <button style={{ background: 'none', border: 'none', color: '#00A870', cursor: 'pointer' }}>
+                    View Details
+                  </button>
                 </div>
               </div>
-              <h4 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Upcoming Events 2025</h4>
-              <p style={{ opacity: 0.75, marginBottom: '1.5rem' }}>
-                Join industry leaders for a three-day immersive experience covering AI, blockchain, and sustainable tech.
-              </p>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={styles.badge}>650+ Attending</span>
-                <button style={{ background: 'none', border: 'none', color: '#00A870', cursor: 'pointer' }}>
-                  View Details
-                </button>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </section>
@@ -314,18 +338,22 @@ const HomePage = () => {
           <div 
             style={styles.card}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-10px)';
-              e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.4)';
+              if (!isMobile) {
+                e.currentTarget.style.transform = 'translateY(-10px)';
+                e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.4)';
+              }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = 'none';
+              if (!isMobile) {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }
             }}
           >
             <div style={styles.cardIcon}>
               <RocketIcon />
             </div>
-            <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Our Vision</h3>
+            <h3 style={{ fontSize: isMobile ? '1.25rem' : '1.5rem', marginBottom: '1rem' }}>Our Vision</h3>
             <p style={{ opacity: 0.75 }}>
               To become the leading digital platform for event discovery and management across the
               globe—making every event a success story and creating meaningful connections between people.
@@ -335,18 +363,22 @@ const HomePage = () => {
           <div 
             style={styles.card}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-10px)';
-              e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.4)';
+              if (!isMobile) {
+                e.currentTarget.style.transform = 'translateY(-10px)';
+                e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.4)';
+              }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = 'none';
+              if (!isMobile) {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }
             }}
           >
             <div style={styles.cardIcon}>
               <BullseyeIcon />
             </div>
-            <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Our Mission</h3>
+            <h3 style={{ fontSize: isMobile ? '1.25rem' : '1.5rem', marginBottom: '1rem' }}>Our Mission</h3>
             <p style={{ opacity: 0.75 }}>
               To empower event creators and participants with technology that makes planning,
               booking, and enjoying events simple, seamless, and meaningful while fostering community engagement.
@@ -388,18 +420,22 @@ const HomePage = () => {
                 key={index}
                 style={styles.card}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-10px)';
-                  e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.4)';
+                  if (!isMobile) {
+                    e.currentTarget.style.transform = 'translateY(-10px)';
+                    e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.4)';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
+                  if (!isMobile) {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }
                 }}
               >
                 <div style={styles.cardIcon}>
                   <LightbulbIcon />
                 </div>
-                <h4 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>{story.title}</h4>
+                <h4 style={{ fontSize: isMobile ? '1.125rem' : '1.25rem', marginBottom: '1rem' }}>{story.title}</h4>
                 <p style={{ opacity: 0.75, marginBottom: '1.5rem' }}>{story.description}</p>
                 <span style={styles.badge}>{story.attendees} Attendees</span>
               </div>
@@ -419,8 +455,8 @@ const HomePage = () => {
           </p>
           <button 
             style={{...styles.button, ...styles.primaryButton, margin: '0 auto'}}
-            onMouseEnter={(e) => e.target.style.transform = 'translateY(-5px)'}
-            onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+            onMouseEnter={(e) => !isMobile && (e.target.style.transform = 'translateY(-5px)')}
+            onMouseLeave={(e) => !isMobile && (e.target.style.transform = 'translateY(0)')}
           >
             Get Started Today
           </button>
@@ -439,6 +475,20 @@ const HomePage = () => {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
+          }
+          
+          @media (max-width: 768px) {
+            .button {
+              width: 100%;
+              justify-content: center;
+            }
+          }
+          
+          @media (hover: none) {
+            .card:hover {
+              transform: none !important;
+              box-shadow: none !important;
+            }
           }
         `}
       </style>

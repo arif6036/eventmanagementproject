@@ -97,12 +97,12 @@ const MyTickets = () => {
       transition={{ duration: 0.6 }}
       style={{ backgroundColor: "#1c4f3d", minHeight: "100vh", color: "#fff" }}
     >
-      <Container className="py-5">
-        <Row className="justify-content-center">
+      <Container className="py-5" >
+        <Row className="justify-content-center" >
           <Col xs={12} lg={10}>
             <motion.h2
               className="mb-4 text-center fw-bold"
-              style={{ color: "#21d19f" }}
+              style={{ color: "white" }}
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
             >

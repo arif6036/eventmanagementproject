@@ -138,6 +138,7 @@ const updateUserProfile = async (req, res) => {
         // Update user fields (only if provided)
         if (req.body.name) user.name = req.body.name;
         if (req.body.email) user.email = req.body.email;
+        if (req.body.darkMode !== undefined) user.darkMode = req.body.darkMode;
 
         // Update password if provided
         if (req.body.password) {
@@ -338,6 +339,14 @@ const deleteAllUsers = async (req, res) => {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 };
+const deleteAccount = async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.user.id);
+    res.json({ message: "Your account has been deleted successfully." });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
 
 module.exports = {
     registerUser,
@@ -350,5 +359,7 @@ module.exports = {
     resetPassword,
     getAllUsers,
     deleteUser,
-    deleteAllUsers
+    deleteAllUsers,
+    deleteAccount,
+    generateToken,
 };
