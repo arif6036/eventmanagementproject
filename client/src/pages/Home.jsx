@@ -321,9 +321,23 @@ const HomePage = () => {
       {/* About Section */}
       <section style={{...styles.section, backgroundColor: '#0a1914'}}>
         <div style={styles.content}>
-          <span style={{...styles.badge, display: 'block', textAlign: 'center', marginBottom: '1rem'}}>
-            ABOUT US
-          </span>
+        <button
+  onClick={() => document.getElementById("vismis")?.scrollIntoView({ behavior: "smooth" })}
+  style={{
+    ...styles.badge,
+    display: 'block',
+    textAlign: 'center',
+    marginBottom: '1rem',
+    background: 'rgba(0, 168, 112, 0.2)',
+    color: '#00A870',
+    border: 'none',
+    width: '100%',
+    cursor: 'pointer',
+    fontSize: '1rem'
+  }}
+>
+  ABOUT US
+</button>
           <h2 style={styles.sectionTitle}>Transforming Event Experiences</h2>
           <p style={styles.sectionSubtitle}>
             We're revolutionizing how events are created, discovered, and experienced—connecting people, ideas, 
@@ -333,7 +347,7 @@ const HomePage = () => {
       </section>
 
       {/* Vision & Mission Section */}
-      <section style={{...styles.section, background: 'linear-gradient(180deg, rgb(20, 56, 44) 0%, #072E1F 100%)'}}>
+      <section  id="vismis" style={{...styles.section, background: 'linear-gradient(180deg, rgb(20, 56, 44) 0%, #072E1F 100%)'}}>
         <div style={styles.grid}>
           <div 
             style={styles.card}
@@ -390,15 +404,29 @@ const HomePage = () => {
       {/* Success Stories Section */}
       <section style={{...styles.section, backgroundColor: '#0a1914'}}>
         <div style={styles.content}>
-          <span style={{...styles.badge, display: 'block', textAlign: 'center', marginBottom: '1rem'}}>
-            SUCCESS STORIES
-          </span>
+        <button
+  onClick={() => document.getElementById("sstory")?.scrollIntoView({ behavior: "smooth" })}
+  style={{
+    ...styles.badge,
+    display: 'block',
+    textAlign: 'center',
+    marginBottom: '1rem',
+    background: 'rgba(0, 168, 112, 0.2)',
+    color: '#00A870',
+    border: 'none',
+    width: '100%',
+    cursor: 'pointer',
+    fontSize: '1rem'
+  }}
+>
+  SUCCESS STORIES
+</button>
           <h2 style={styles.sectionTitle}>Events That Made an Impact</h2>
           <p style={styles.sectionSubtitle}>
             Discover how our platform has helped event organizers create meaningful experiences and build stronger communities.
           </p>
           
-          <div style={styles.grid}>
+          <div id="sstory" style={styles.grid}>
             {[
               {
                 title: "Tech Summit 2024",
@@ -457,6 +485,7 @@ const HomePage = () => {
             style={{...styles.button, ...styles.primaryButton, margin: '0 auto'}}
             onMouseEnter={(e) => !isMobile && (e.target.style.transform = 'translateY(-5px)')}
             onMouseLeave={(e) => !isMobile && (e.target.style.transform = 'translateY(0)')}
+            onClick={() => window.location.href = '/events'}
           >
             Get Started Today
           </button>
